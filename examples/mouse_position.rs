@@ -1,5 +1,7 @@
 use bevy::{input::InputSystem, prelude::*, window::PrimaryWindow};
-use leafwing_input_manager::{axislike::DualAxisData, plugin::InputManagerSystem, prelude::*};
+use leafwing_input_manager::{
+    axislike::DualAxisData, plugin::InputManagerSystem, prelude::*, systems::run_if_enabled,
+};
 
 fn main() {
     App::new()
@@ -9,7 +11,9 @@ fn main() {
         .add_systems(
             Update,
             update_cursor_state_from_window
+                .run_if(run_if_enabled::<BoxMovement>)
                 .in_set(InputManagerSystem::ManualControl)
+                .before(InputManagerSystem::ReleaseOnDisable)
                 .after(InputManagerSystem::Tick)
                 .after(InputManagerSystem::Update)
                 .after(InputSystem),

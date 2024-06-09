@@ -3,10 +3,8 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use bevy::{
-    math::FloatOrd,
-    prelude::{Reflect, Vec2},
-};
+use bevy::prelude::{Reflect, Vec2};
+use bevy::utils::FloatOrd;
 use serde::{Deserialize, Serialize};
 
 use super::DualAxisProcessor;

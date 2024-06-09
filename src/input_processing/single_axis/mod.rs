@@ -2,7 +2,8 @@
 
 use std::hash::{Hash, Hasher};
 
-use bevy::{math::FloatOrd, prelude::Reflect};
+use bevy::prelude::Reflect;
+use bevy::utils::FloatOrd;
 use serde::{Deserialize, Serialize};
 
 pub use self::custom::*;

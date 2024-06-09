@@ -29,7 +29,7 @@ use crate::typetag::RegisterTypeTag;
 /// ```rust
 /// use std::hash::{Hash, Hasher};
 /// use bevy::prelude::*;
-/// use bevy::math::FloatOrd;
+/// use bevy::utils::FloatOrd;
 /// use serde::{Deserialize, Serialize};
 /// use leafwing_input_manager::prelude::*;
 ///
@@ -191,10 +191,6 @@ impl Reflect for Box<dyn CustomAxisProcessor> {
 
     fn debug(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         Debug::fmt(self, f)
-    }
-
-    fn try_apply(&mut self, _value: &dyn Reflect) -> Result<(), bevy::reflect::ApplyError> {
-        todo!()
     }
 }
 
