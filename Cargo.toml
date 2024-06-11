@@ -1,10 +1,10 @@
 [package]
-name = "leafwing-input-manager"
+name = "input-manager"
 description = "A powerfully direct stateful input manager for the Bevy game engine."
 version = "0.14.0"
 authors = ["Leafwing Studios"]
 homepage = "https://leafwing-studios.com/"
-repository = "https://github.com/ka-de/leafwing-input-manager"
+repository = "https://github.com/ka-de/input-manager"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 categories = ["games", "game-development"]
@@ -82,7 +82,7 @@ name = "input_map"
 harness = false
 
 [lib]
-name = "leafwing_input_manager"
+name = "input_manager"
 path = "src/lib.rs"
 
 
