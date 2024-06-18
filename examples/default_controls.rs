@@ -1,7 +1,7 @@
 //! Demonstrates how to create default controls for an `Actionlike` and add it to an `InputMap`
 
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()

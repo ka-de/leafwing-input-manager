@@ -29,7 +29,7 @@ pub enum DualAxisProcessor {
     ///
     /// ```rust
     /// use bevy::prelude::*;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // 1.0 for positive values
     /// assert_eq!(DualAxisProcessor::Digital.process(Vec2::splat(2.5)), Vec2::ONE);
@@ -342,7 +342,7 @@ pub trait WithDualAxisProcessingPipelineExt: Sized {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let value = Vec2::new(1.5, 2.0);
 /// let Vec2 { x, y } = value;
@@ -403,7 +403,7 @@ impl Hash for DualAxisInverted {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let value = Vec2::new(1.5, 2.5);
 /// let Vec2 { x, y } = value;

@@ -7,8 +7,8 @@
 
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-use leafwing_input_manager::plugin::InputManagerSystem;
-use leafwing_input_manager::prelude::*;
+use input_manager::plugin::InputManagerSystem;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()

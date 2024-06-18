@@ -45,8 +45,8 @@ use crate::Actionlike;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
-/// use leafwing_input_manager::user_input::InputControlKind;
+/// use input_manager::prelude::*;
+/// use input_manager::user_input::InputControlKind;
 ///
 /// // Define your actions.
 /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
@@ -449,7 +449,7 @@ impl<A: Actionlike, U: UserInput> From<HashMap<A, Vec<U>>> for InputMap<A> {
     /// ```rust
     /// use bevy::prelude::*;
     /// use bevy::utils::HashMap;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
     /// enum Action {
@@ -492,7 +492,7 @@ mod tests {
     use serde::{Deserialize, Serialize};
 
     use super::*;
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use crate::prelude::*;
 
     #[derive(

@@ -18,7 +18,7 @@ use crate::input_processing::single_axis::*;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Restrict X to [-2.0, 2.5] and Y to [-1.0, 1.5].
 /// let bounds = DualAxisBounds::new((-2.0, 2.5), (-1.0, 1.5));
@@ -372,7 +372,7 @@ impl From<AxisBounds> for DualAxisProcessor {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude X within [-0.2, 0.3] and Y within [-0.1, 0.4].
 /// let exclusion = DualAxisExclusion::new((-0.2, 0.3), (-0.1, 0.4));
@@ -675,7 +675,7 @@ impl From<AxisExclusion> for DualAxisProcessor {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude X within [-0.2, 0.3] and Y within [-0.1, 0.4].
 /// let deadzone = DualAxisDeadZone::new((-0.2, 0.3), (-0.1, 0.4));

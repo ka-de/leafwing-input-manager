@@ -3,8 +3,8 @@ use bevy::input::gamepad::{
 };
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::axislike::DualAxisData;
-use leafwing_input_manager::prelude::*;
+use input_manager::axislike::DualAxisData;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum ButtonlikeTestAction {

@@ -9,9 +9,9 @@
 use bevy::ecs::event::ManualEventReader;
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::action_diff::ActionDiffEvent;
-use leafwing_input_manager::prelude::*;
-use leafwing_input_manager::systems::generate_action_diffs;
+use input_manager::action_diff::ActionDiffEvent;
+use input_manager::prelude::*;
+use input_manager::systems::generate_action_diffs;
 
 use std::fmt::Debug;
 

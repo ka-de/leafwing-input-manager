@@ -5,7 +5,7 @@ use bevy::{
     prelude::{App, KeyCode},
 };
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use leafwing_input_manager::{
+use input_manager::{
     action_state::ActionData,
     input_streams::InputStreams,
     prelude::{ClashStrategy, InputMap, MockInput},

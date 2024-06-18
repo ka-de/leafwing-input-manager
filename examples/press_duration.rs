@@ -4,7 +4,7 @@
 //! Press Left / Right or A / D to move your character to the left and right!
 
 use bevy::{prelude::*, window::PrimaryWindow};
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()

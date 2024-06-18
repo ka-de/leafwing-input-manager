@@ -31,7 +31,7 @@ use crate::typetag::RegisterTypeTag;
 /// use bevy::prelude::*;
 /// use bevy::math::FloatOrd;
 /// use serde::{Deserialize, Serialize};
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// /// Doubles the input, takes its absolute value,
 /// /// and discards results that meet the specified condition on the X-axis.
@@ -313,8 +313,8 @@ impl RegisterDualAxisProcessorExt for App {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate as leafwing_input_manager;
-    use leafwing_input_manager_macros::serde_typetag;
+    use crate as input_manager;
+    use input_manager_macros::serde_typetag;
     use serde_test::{assert_tokens, Token};
 
     #[test]

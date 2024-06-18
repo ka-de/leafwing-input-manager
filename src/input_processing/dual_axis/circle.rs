@@ -18,7 +18,7 @@ use super::DualAxisProcessor;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Restrict magnitudes to no greater than 2
 /// let bounds = CircleBounds::new(2.0);
@@ -111,7 +111,7 @@ impl Hash for CircleBounds {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude magnitudes less than or equal to 0.2
 /// let exclusion = CircleExclusion::new(0.2);
@@ -228,7 +228,7 @@ impl Hash for CircleExclusion {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude magnitudes less than or equal to 0.2
 /// let deadzone = CircleDeadZone::new(0.2);

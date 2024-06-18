@@ -1,10 +1,10 @@
 //! Mouse inputs
 
 use bevy::prelude::{MouseButton, Reflect, Vec2};
-use leafwing_input_manager_macros::serde_typetag;
+use input_manager_macros::serde_typetag;
 use serde::{Deserialize, Serialize};
 
-use crate as leafwing_input_manager;
+use crate as input_manager;
 use crate::axislike::{DualAxisData, DualAxisDirection, DualAxisType};
 use crate::clashing_inputs::BasicInputs;
 use crate::input_processing::*;
@@ -87,7 +87,7 @@ fn accumulate_mouse_movement(input_streams: &InputStreams) -> Vec2 {
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -179,7 +179,7 @@ impl UserInput for MouseMoveDirection {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -306,7 +306,7 @@ impl WithAxisProcessingPipelineExt for MouseMoveAxis {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -437,7 +437,7 @@ fn accumulate_wheel_movement(input_streams: &InputStreams) -> Vec2 {
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -529,7 +529,7 @@ impl UserInput for MouseScrollDirection {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -655,7 +655,7 @@ impl WithAxisProcessingPipelineExt for MouseScrollAxis {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);

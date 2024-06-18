@@ -9,7 +9,7 @@
 use bevy::{
     input::gamepad::GamepadEvent, input::keyboard::KeyboardInput, prelude::*, window::PrimaryWindow,
 };
-use leafwing_input_manager::{axislike::DualAxisData, prelude::*};
+use input_manager::{axislike::DualAxisData, prelude::*};
 
 fn main() {
     App::new()

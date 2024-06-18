@@ -2,7 +2,7 @@
 //! See: https://github.com/dtolnay/cargo-expand
 //! use `cargo expand --test actionlike_derive`
 use bevy::prelude::Reflect;
-use leafwing_input_manager::Actionlike;
+use input_manager::Actionlike;
 
 #[derive(Actionlike, Debug, Hash, PartialEq, Eq, Clone, Copy, Reflect)]
 enum UnitAction {}

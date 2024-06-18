@@ -85,7 +85,7 @@ impl ActionData {
 /// # Example
 /// ```rust
 /// use bevy::reflect::Reflect;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 /// use bevy::utils::Instant;
 ///
 /// #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
@@ -203,8 +203,8 @@ impl<A: Actionlike> ActionState<A> {
     /// # Example
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
-    /// use leafwing_input_manager::buttonlike::ButtonState;
+    /// use input_manager::prelude::*;
+    /// use input_manager::buttonlike::ButtonState;
     /// use bevy::utils::Instant;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
@@ -388,7 +388,7 @@ impl<A: Actionlike> ActionState<A> {
     /// # Example
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     /// enum AbilitySlot {
@@ -479,7 +479,7 @@ impl<A: Actionlike> ActionState<A> {
     ///
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     /// enum Action {
@@ -739,7 +739,7 @@ impl<A: Actionlike> ActionState<A> {
 
 #[cfg(test)]
 mod tests {
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use crate::action_state::ActionState;
     use crate::clashing_inputs::ClashStrategy;
     use crate::input_map::InputMap;
@@ -749,7 +749,7 @@ mod tests {
     use bevy::input::InputPlugin;
     use bevy::prelude::*;
     use bevy::utils::{Duration, Instant};
-    use leafwing_input_manager_macros::Actionlike;
+    use input_manager_macros::Actionlike;
 
     #[test]
     fn press_lifecycle() {

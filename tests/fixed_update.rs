@@ -2,11 +2,11 @@ use bevy::input::InputPlugin;
 use bevy::prelude::*;
 use bevy::time::TimeUpdateStrategy;
 use bevy::MinimalPlugins;
-use leafwing_input_manager::action_state::ActionState;
-use leafwing_input_manager::input_map::InputMap;
-use leafwing_input_manager::input_mocking::MockInput;
-use leafwing_input_manager::plugin::{InputManagerPlugin, InputManagerSystem};
-use leafwing_input_manager_macros::Actionlike;
+use input_manager::action_state::ActionState;
+use input_manager::input_map::InputMap;
+use input_manager::input_mocking::MockInput;
+use input_manager::plugin::{InputManagerPlugin, InputManagerSystem};
+use input_manager_macros::Actionlike;
 use std::time::Duration;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]

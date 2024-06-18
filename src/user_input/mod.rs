@@ -140,11 +140,11 @@ pub enum InputControlKind {
 /// use bevy::prelude::*;
 /// use bevy::math::FloatOrd;
 /// use serde::{Deserialize, Serialize};
-/// use leafwing_input_manager::prelude::*;
-/// use leafwing_input_manager::input_streams::InputStreams;
-/// use leafwing_input_manager::axislike::{DualAxisType, DualAxisData};
-/// use leafwing_input_manager::raw_inputs::RawInputs;
-/// use leafwing_input_manager::clashing_inputs::BasicInputs;
+/// use input_manager::prelude::*;
+/// use input_manager::input_streams::InputStreams;
+/// use input_manager::axislike::{DualAxisType, DualAxisData};
+/// use input_manager::raw_inputs::RawInputs;
+/// use input_manager::clashing_inputs::BasicInputs;
 ///
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Serialize, Deserialize)]
 /// pub struct MouseScrollAlwaysFiveOnYAxis;

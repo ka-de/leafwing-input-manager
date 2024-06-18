@@ -12,7 +12,7 @@ use super::AxisProcessor;
 /// to avoid unexpected behavior caused by extreme inputs.
 ///
 /// ```rust
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Restrict values to [-2.0, 1.5].
 /// let bounds = AxisBounds::new(-2.0, 1.5);
@@ -164,7 +164,7 @@ impl Hash for AxisBounds {
 /// # Examples
 ///
 /// ```rust
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude values between -0.2 and 0.3
 /// let exclusion = AxisExclusion::new(-0.2, 0.3);
@@ -317,7 +317,7 @@ impl Hash for AxisExclusion {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude values between -0.2 and 0.3
 /// let deadzone = AxisDeadZone::new(-0.2, 0.3);

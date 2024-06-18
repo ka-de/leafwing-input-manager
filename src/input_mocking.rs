@@ -42,8 +42,8 @@ use crate::user_input::*;
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::input_mocking::MockInput;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::input_mocking::MockInput;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 ///
@@ -189,8 +189,8 @@ pub trait MockInput {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::input_mocking::QueryInput;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::input_mocking::QueryInput;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 ///

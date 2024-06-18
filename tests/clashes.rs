@@ -2,8 +2,8 @@ use bevy::ecs::system::SystemState;
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
 use bevy::utils::HashSet;
-use leafwing_input_manager::input_streams::InputStreams;
-use leafwing_input_manager::prelude::*;
+use input_manager::input_streams::InputStreams;
+use input_manager::prelude::*;
 
 fn test_app() -> App {
     let mut app = App::new();

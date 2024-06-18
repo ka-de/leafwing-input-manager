@@ -1,10 +1,10 @@
 //! This module contains [`InputChord`] and its impls.
 
 use bevy::prelude::Reflect;
-use leafwing_input_manager_macros::serde_typetag;
+use input_manager_macros::serde_typetag;
 use serde::{Deserialize, Serialize};
 
-use crate as leafwing_input_manager;
+use crate as input_manager;
 use crate::clashing_inputs::BasicInputs;
 use crate::input_streams::InputStreams;
 use crate::raw_inputs::RawInputs;
@@ -37,7 +37,7 @@ use crate::user_input::{DualAxisData, InputControlKind, UserInput};
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);

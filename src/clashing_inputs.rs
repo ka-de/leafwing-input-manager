@@ -332,10 +332,10 @@ mod tests {
     use bevy::app::App;
     use bevy::input::keyboard::KeyCode::*;
     use bevy::prelude::Reflect;
-    use leafwing_input_manager_macros::Actionlike;
+    use input_manager_macros::Actionlike;
 
     use super::*;
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use crate::prelude::KeyboardVirtualDPad;
     use crate::user_input::InputChord;
 

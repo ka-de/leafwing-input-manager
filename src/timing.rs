@@ -57,9 +57,9 @@ impl Timing {
 
 #[cfg(test)]
 mod tests {
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use bevy::prelude::Reflect;
-    use leafwing_input_manager_macros::Actionlike;
+    use input_manager_macros::Actionlike;
 
     #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     enum Action {

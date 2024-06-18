@@ -21,7 +21,7 @@ pub enum AxisProcessor {
     /// similar to [`f32::signum()`] but returning `0.0` for zero values.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // 1.0 for positive values
     /// assert_eq!(AxisProcessor::Digital.process(2.5), 1.0);
@@ -40,7 +40,7 @@ pub enum AxisProcessor {
     /// Flips the sign of input values, resulting in a directional reversal of control.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// assert_eq!(AxisProcessor::Inverted.process(2.5), -2.5);
     /// assert_eq!(AxisProcessor::Inverted.process(-2.5), 2.5);
@@ -50,7 +50,7 @@ pub enum AxisProcessor {
     /// Scales input values using a specified multiplier to fine-tune the responsiveness of control.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // Doubled!
     /// assert_eq!(AxisProcessor::Sensitivity(2.0).process(2.0), 4.0);

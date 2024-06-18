@@ -1,8 +1,8 @@
 use bevy::{prelude::Reflect, utils::HashMap};
 use criterion::{criterion_group, criterion_main, Criterion};
 #[cfg(feature = "timing")]
-use leafwing_input_manager::timing::Timing;
-use leafwing_input_manager::{
+use input_manager::timing::Timing;
+use input_manager::{
     action_state::ActionData, buttonlike::ButtonState, prelude::ActionState, Actionlike,
 };
 
