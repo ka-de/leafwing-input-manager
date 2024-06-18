@@ -4,16 +4,16 @@ use std::fmt::Debug;
 
 #[cfg(feature = "asset")]
 use bevy::asset::Asset;
-use bevy::prelude::{Component, Gamepad, Reflect, Resource};
+use bevy::prelude::{ Component, Gamepad, Reflect, Resource };
 use bevy::utils::HashMap;
 use itertools::Itertools;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 use crate::action_state::ActionData;
 use crate::buttonlike::ButtonState;
 use crate::clashing_inputs::ClashStrategy;
 use crate::input_streams::InputStreams;
-use crate::user_input::{InputKind, Modifier, UserInput};
+use crate::user_input::{ InputKind, Modifier, UserInput };
 use crate::Actionlike;
 
 /// A Multi-Map that allows you to map actions to multiple [`UserInput`]s.
@@ -45,8 +45,8 @@ use crate::Actionlike;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
-/// use leafwing_input_manager::user_input::InputKind;
+/// use input_manager::prelude::*;
+/// use input_manager::user_input::InputKind;
 ///
 /// // Define your actions.
 /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
@@ -112,9 +112,7 @@ impl<A: Actionlike> InputMap<A> {
     pub fn new(bindings: impl IntoIterator<Item = (A, impl Into<UserInput>)>) -> Self {
         bindings
             .into_iter()
-            .fold(Self::default(), |map, (action, input)| {
-                map.with(action, input)
-            })
+            .fold(Self::default(), |map, (action, input)| { map.with(action, input) })
     }
 
     /// Associates an `action` with a specific `input`.
@@ -136,7 +134,7 @@ impl<A: Actionlike> InputMap<A> {
     pub fn with_one_to_many(
         mut self,
         action: A,
-        inputs: impl IntoIterator<Item = impl Into<UserInput>>,
+        inputs: impl IntoIterator<Item = impl Into<UserInput>>
     ) -> Self {
         self.insert_one_to_many(action, inputs);
         self
@@ -149,7 +147,7 @@ impl<A: Actionlike> InputMap<A> {
     #[inline(always)]
     pub fn with_multiple(
         mut self,
-        bindings: impl IntoIterator<Item = (A, impl Into<UserInput>)>,
+        bindings: impl IntoIterator<Item = (A, impl Into<UserInput>)>
     ) -> Self {
         self.insert_multiple(bindings);
         self
@@ -185,7 +183,7 @@ impl<A: Actionlike> InputMap<A> {
     pub fn insert_one_to_many(
         &mut self,
         action: A,
-        inputs: impl IntoIterator<Item = impl Into<UserInput>>,
+        inputs: impl IntoIterator<Item = impl Into<UserInput>>
     ) -> &mut Self {
         let inputs = inputs.into_iter().map(|input| input.into());
         if let Some(bindings) = self.map.get_mut(&action) {
@@ -208,7 +206,7 @@ impl<A: Actionlike> InputMap<A> {
     #[inline(always)]
     pub fn insert_multiple(
         &mut self,
-        bindings: impl IntoIterator<Item = (A, impl Into<UserInput>)>,
+        bindings: impl IntoIterator<Item = (A, impl Into<UserInput>)>
     ) -> &mut Self {
         for (action, input) in bindings.into_iter() {
             self.insert(action, input);
@@ -226,7 +224,7 @@ impl<A: Actionlike> InputMap<A> {
     pub fn insert_chord(
         &mut self,
         action: A,
-        buttons: impl IntoIterator<Item = impl Into<InputKind>>,
+        buttons: impl IntoIterator<Item = impl Into<InputKind>>
     ) -> &mut Self {
         self.insert(action, UserInput::chord(buttons));
         self
@@ -239,7 +237,7 @@ impl<A: Actionlike> InputMap<A> {
         &mut self,
         action: A,
         modifier: Modifier,
-        input: impl Into<InputKind>,
+        input: impl Into<InputKind>
     ) -> &mut Self {
         self.insert(action, UserInput::modified(modifier, input));
         self
@@ -327,7 +325,7 @@ impl<A: Actionlike> InputMap<A> {
         &self,
         action: &A,
         input_streams: &InputStreams,
-        clash_strategy: ClashStrategy,
+        clash_strategy: ClashStrategy
     ) -> bool {
         self.process_actions(input_streams, clash_strategy)
             .get(action)
@@ -342,7 +340,7 @@ impl<A: Actionlike> InputMap<A> {
     pub fn process_actions(
         &self,
         input_streams: &InputStreams,
-        clash_strategy: ClashStrategy,
+        clash_strategy: ClashStrategy
     ) -> HashMap<A, ActionData> {
         let mut action_data = HashMap::new();
 
@@ -353,11 +351,10 @@ impl<A: Actionlike> InputMap<A> {
             for input in input_bindings {
                 // Merge the axis pair into action datum
                 if let Some(axis_pair) = input_streams.input_axis_pair(input) {
-                    action_datum.axis_pair = action_datum
-                        .axis_pair
-                        .map_or(Some(axis_pair), |current_axis_pair| {
-                            Some(current_axis_pair.merged_with(axis_pair))
-                        });
+                    action_datum.axis_pair = action_datum.axis_pair.map_or(
+                        Some(axis_pair),
+                        |current_axis_pair| { Some(current_axis_pair.merged_with(axis_pair)) }
+                    );
                 }
 
                 if input_streams.input_pressed(input) {
@@ -385,9 +382,7 @@ impl<A: Actionlike> InputMap<A> {
 
     /// Returns an iterator over all registered action-input bindings.
     pub fn bindings(&self) -> impl Iterator<Item = (&A, &UserInput)> {
-        self.map
-            .iter()
-            .flat_map(|(action, inputs)| inputs.iter().map(move |input| (action, input)))
+        self.map.iter().flat_map(|(action, inputs)| inputs.iter().map(move |input| (action, input)))
     }
 
     /// Returns an iterator over all registered actions.
@@ -410,7 +405,10 @@ impl<A: Actionlike> InputMap<A> {
     /// Count the total number of registered input bindings.
     #[must_use]
     pub fn len(&self) -> usize {
-        self.map.values().map(|inputs| inputs.len()).sum()
+        self.map
+            .values()
+            .map(|inputs| inputs.len())
+            .sum()
     }
 
     /// Returns `true` if the map contains no action-input bindings.
@@ -463,7 +461,7 @@ impl<A: Actionlike> From<HashMap<A, Vec<UserInput>>> for InputMap<A> {
     /// ```rust
     /// use bevy::prelude::*;
     /// use bevy::utils::HashMap;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
     /// enum Action {
@@ -493,19 +491,16 @@ impl<A: Actionlike> From<HashMap<A, Vec<UserInput>>> for InputMap<A> {
 
 impl<A: Actionlike> FromIterator<(A, UserInput)> for InputMap<A> {
     fn from_iter<T: IntoIterator<Item = (A, UserInput)>>(iter: T) -> Self {
-        iter.into_iter()
-            .fold(Self::default(), |map, (action, input)| {
-                map.with(action, input)
-            })
+        iter.into_iter().fold(Self::default(), |map, (action, input)| { map.with(action, input) })
     }
 }
 
 mod tests {
     use bevy::prelude::Reflect;
-    use serde::{Deserialize, Serialize};
+    use serde::{ Deserialize, Serialize };
 
     use super::*;
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use crate::prelude::*;
 
     #[derive(
@@ -520,7 +515,7 @@ mod tests {
         Ord,
         Hash,
         Debug,
-        Reflect,
+        Reflect
     )]
     enum Action {
         Run,
@@ -615,7 +610,7 @@ mod tests {
 
     #[test]
     fn merging() {
-        use bevy::input::{gamepad::GamepadButtonType, keyboard::KeyCode};
+        use bevy::input::{ gamepad::GamepadButtonType, keyboard::KeyCode };
 
         let mut input_map = InputMap::default();
         let mut default_keyboard_map = InputMap::default();

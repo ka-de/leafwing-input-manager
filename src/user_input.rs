@@ -1,14 +1,14 @@
 //! Helpful abstractions over user inputs of all sorts
 
-use bevy::input::{gamepad::GamepadButtonType, keyboard::KeyCode, mouse::MouseButton};
+use bevy::input::{ gamepad::GamepadButtonType, keyboard::KeyCode, mouse::MouseButton };
 use bevy::reflect::Reflect;
 use bevy::utils::HashSet;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 use crate::axislike::VirtualAxis;
 use crate::{
-    axislike::{AxisType, DualAxis, SingleAxis, VirtualDPad},
-    buttonlike::{MouseMotionDirection, MouseWheelDirection},
+    axislike::{ AxisType, DualAxis, SingleAxis, VirtualDPad },
+    buttonlike::{ MouseMotionDirection, MouseWheelDirection },
 };
 
 /// Some combination of user input, which may cross input-mode boundaries.
@@ -50,7 +50,10 @@ impl UserInput {
     /// If `inputs` has a length of 1, a [`UserInput::Single`] variant will be returned instead.
     pub fn chord(inputs: impl IntoIterator<Item = impl Into<InputKind>>) -> Self {
         // We can't just check the length unless we add an ExactSizeIterator bound :(
-        let vec: Vec<InputKind> = inputs.into_iter().map(|input| input.into()).collect();
+        let vec: Vec<InputKind> = inputs
+            .into_iter()
+            .map(|input| input.into())
+            .collect();
 
         match vec.len() {
             1 => UserInput::Single(vec[0].clone()),
@@ -82,7 +85,7 @@ impl UserInput {
     /// ```rust
     /// use bevy::input::keyboard::KeyCode::*;
     /// use bevy::utils::HashSet;
-    /// use leafwing_input_manager::user_input::UserInput;
+    /// use input_manager::user_input::UserInput;
     ///
     /// let buttons = HashSet::from_iter([ControlLeft.into(), AltLeft.into()]);
     /// let a: UserInput  = KeyA.into();
@@ -101,23 +104,23 @@ impl UserInput {
 
     /// Returns the raw inputs that make up this [`UserInput`]
     pub fn raw_inputs(&self) -> RawInputs {
-        self.iter()
-            .fold(RawInputs::default(), |mut raw_inputs, input| {
-                raw_inputs.merge_input_data(&input);
-                raw_inputs
-            })
+        self.iter().fold(RawInputs::default(), |mut raw_inputs, input| {
+            raw_inputs.merge_input_data(&input);
+            raw_inputs
+        })
     }
 
     pub(crate) fn iter(&self) -> UserInputIter {
         match self {
             UserInput::Single(button) => UserInputIter::Single(Some(button.clone())),
             UserInput::Chord(buttons) => UserInputIter::Chord(buttons.iter()),
-            UserInput::VirtualDPad(dpad) => UserInputIter::VirtualDPad(
-                Some(dpad.up.clone()),
-                Some(dpad.down.clone()),
-                Some(dpad.left.clone()),
-                Some(dpad.right.clone()),
-            ),
+            UserInput::VirtualDPad(dpad) =>
+                UserInputIter::VirtualDPad(
+                    Some(dpad.up.clone()),
+                    Some(dpad.down.clone()),
+                    Some(dpad.left.clone()),
+                    Some(dpad.right.clone())
+                ),
             UserInput::VirtualAxis(axis) => {
                 UserInputIter::VirtualAxis(Some(axis.negative.clone()), Some(axis.positive.clone()))
             }
@@ -128,12 +131,7 @@ impl UserInput {
 pub(crate) enum UserInputIter<'a> {
     Single(Option<InputKind>),
     Chord(std::slice::Iter<'a, InputKind>),
-    VirtualDPad(
-        Option<InputKind>,
-        Option<InputKind>,
-        Option<InputKind>,
-        Option<InputKind>,
-    ),
+    VirtualDPad(Option<InputKind>, Option<InputKind>, Option<InputKind>, Option<InputKind>),
     VirtualAxis(Option<InputKind>, Option<InputKind>),
 }
 
@@ -144,9 +142,8 @@ impl<'a> Iterator for UserInputIter<'a> {
         match self {
             Self::Single(ref mut input) => input.take(),
             Self::Chord(ref mut iter) => iter.next().cloned(),
-            Self::VirtualDPad(ref mut up, ref mut down, ref mut left, ref mut right) => up
-                .take()
-                .or_else(|| down.take().or_else(|| left.take().or_else(|| right.take()))),
+            Self::VirtualDPad(ref mut up, ref mut down, ref mut left, ref mut right) =>
+                up.take().or_else(|| down.take().or_else(|| left.take().or_else(|| right.take()))),
             Self::VirtualAxis(ref mut negative, ref mut positive) => {
                 negative.take().or_else(|| positive.take())
             }
@@ -422,7 +419,7 @@ impl RawInputs {
 
 #[cfg(test)]
 mod raw_input_tests {
-    use crate::user_input::{InputKind, RawInputs, UserInput};
+    use crate::user_input::{ InputKind, RawInputs, UserInput };
 
     #[test]
     fn simple_chord() {
@@ -460,7 +457,7 @@ mod raw_input_tests {
     }
 
     mod gamepad {
-        use crate::user_input::{RawInputs, UserInput};
+        use crate::user_input::{ RawInputs, UserInput };
 
         #[test]
         fn gamepad_button() {
@@ -495,7 +492,7 @@ mod raw_input_tests {
     }
 
     mod keyboard {
-        use crate::user_input::{RawInputs, UserInput};
+        use crate::user_input::{ RawInputs, UserInput };
 
         #[test]
         fn keyboard_button() {
@@ -523,7 +520,7 @@ mod raw_input_tests {
     }
 
     mod mouse {
-        use crate::user_input::{RawInputs, UserInput};
+        use crate::user_input::{ RawInputs, UserInput };
 
         #[test]
         fn mouse_button() {

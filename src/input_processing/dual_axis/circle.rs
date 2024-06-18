@@ -1,11 +1,11 @@
 //! Circular range processors for dual-axis inputs
 
 use std::fmt::Debug;
-use std::hash::{Hash, Hasher};
+use std::hash::{ Hash, Hasher };
 
-use bevy::prelude::{Reflect, Vec2};
+use bevy::prelude::{ Reflect, Vec2 };
 use bevy::utils::FloatOrd;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 use super::DualAxisProcessor;
 
@@ -16,7 +16,7 @@ use super::DualAxisProcessor;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Restrict magnitudes to no greater than 2
 /// let bounds = CircleBounds::new(2.0);
@@ -109,7 +109,7 @@ impl Hash for CircleBounds {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude magnitudes less than or equal to 0.2
 /// let exclusion = CircleExclusion::new(0.2);
@@ -187,11 +187,7 @@ impl CircleExclusion {
     #[must_use]
     #[inline]
     pub fn exclude(&self, input_value: Vec2) -> Vec2 {
-        if self.contains(input_value) {
-            Vec2::ZERO
-        } else {
-            input_value
-        }
+        if self.contains(input_value) { Vec2::ZERO } else { input_value }
     }
 }
 
@@ -226,7 +222,7 @@ impl Hash for CircleExclusion {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// // Exclude magnitudes less than or equal to 0.2
 /// let deadzone = CircleDeadZone::new(0.2);
@@ -410,9 +406,9 @@ mod tests {
             assert_eq!(DualAxisProcessor::from(bounds), processor);
 
             for x in -300..300 {
-                let x = x as f32 * 0.01;
+                let x = (x as f32) * 0.01;
                 for y in -300..300 {
-                    let y = y as f32 * 0.01;
+                    let y = (y as f32) * 0.01;
                     let value = Vec2::new(x, y);
 
                     assert_eq!(processor.process(value), bounds.clamp(value));
@@ -450,9 +446,9 @@ mod tests {
             assert_eq!(DualAxisProcessor::from(exclusion), processor);
 
             for x in -300..300 {
-                let x = x as f32 * 0.01;
+                let x = (x as f32) * 0.01;
                 for y in -300..300 {
-                    let y = y as f32 * 0.01;
+                    let y = (y as f32) * 0.01;
                     let value = Vec2::new(x, y);
 
                     assert_eq!(processor.process(value), exclusion.exclude(value));
@@ -490,9 +486,9 @@ mod tests {
             assert_eq!(DualAxisProcessor::from(deadzone), processor);
 
             for x in -300..300 {
-                let x = x as f32 * 0.01;
+                let x = (x as f32) * 0.01;
                 for y in -300..300 {
-                    let y = y as f32 * 0.01;
+                    let y = (y as f32) * 0.01;
                     let value = Vec2::new(x, y);
 
                     assert_eq!(processor.process(value), deadzone.normalize(value));
@@ -501,9 +497,10 @@ mod tests {
                     if value.length() <= radius {
                         assert!(deadzone.within_exclusion(value));
                         assert_eq!(deadzone.normalize(value), Vec2::ZERO);
-                    }
-                    // Values within the live zone are scaled linearly.
-                    else if value.length() <= 1.0 {
+                    } else if
+                        // Values within the live zone are scaled linearly.
+                        value.length() <= 1.0
+                    {
                         assert!(deadzone.within_livezone(value));
 
                         let expected_scale = f32::inverse_lerp(radius, 1.0, value.length());
@@ -511,9 +508,8 @@ mod tests {
                         let delta = (deadzone.normalize(value) - expected).abs();
                         assert!(delta.x <= 0.00001);
                         assert!(delta.y <= 0.00001);
-                    }
-                    // Values outside the bounds are restricted to the region.
-                    else {
+                    } else {
+                        // Values outside the bounds are restricted to the region.
                         assert!(!deadzone.within_bounds(value));
 
                         let expected = value.clamp_length_max(1.0);

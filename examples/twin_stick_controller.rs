@@ -7,9 +7,12 @@
 //! the `default_controls`. `mouse_position`, and `action_state_resource` examples.
 
 use bevy::{
-    input::gamepad::GamepadEvent, input::keyboard::KeyboardInput, prelude::*, window::PrimaryWindow,
+    input::gamepad::GamepadEvent,
+    input::keyboard::KeyboardInput,
+    prelude::*,
+    window::PrimaryWindow,
 };
-use leafwing_input_manager::{axislike::DualAxisData, prelude::*};
+use input_manager::{ axislike::DualAxisData, prelude::* };
 
 fn main() {
     App::new()
@@ -22,10 +25,7 @@ fn main() {
         // Set up the scene
         .add_systems(Startup, setup_scene)
         // Set up the input processing
-        .add_systems(
-            Update,
-            player_mouse_look.run_if(in_state(ActiveInput::MouseKeyboard)),
-        )
+        .add_systems(Update, player_mouse_look.run_if(in_state(ActiveInput::MouseKeyboard)))
         .add_systems(Update, control_player.after(player_mouse_look))
         .run();
 }
@@ -65,10 +65,7 @@ impl Plugin for InputModeManagerPlugin {
         // Init a state to record the current active input
         app.init_state::<ActiveInput>()
             // System to switch to gamepad as active input
-            .add_systems(
-                Update,
-                activate_gamepad.run_if(in_state(ActiveInput::MouseKeyboard)),
-            )
+            .add_systems(Update, activate_gamepad.run_if(in_state(ActiveInput::MouseKeyboard)))
             // System to switch to MKB as active input
             .add_systems(Update, activate_mkb.run_if(in_state(ActiveInput::Gamepad)));
     }
@@ -84,7 +81,7 @@ enum ActiveInput {
 /// Switch the gamepad when any button is pressed or any axis input used
 fn activate_gamepad(
     mut next_state: ResMut<NextState<ActiveInput>>,
-    mut gamepad_evr: EventReader<GamepadEvent>,
+    mut gamepad_evr: EventReader<GamepadEvent>
 ) {
     for ev in gamepad_evr.read() {
         match ev {
@@ -101,7 +98,7 @@ fn activate_gamepad(
 /// Switch to mouse and keyboard input when any keyboard button is pressed
 fn activate_mkb(
     mut next_state: ResMut<NextState<ActiveInput>>,
-    mut kb_evr: EventReader<KeyboardInput>,
+    mut kb_evr: EventReader<KeyboardInput>
 ) {
     for _ev in kb_evr.read() {
         info!("Switching to mouse and keyboard input");
@@ -117,24 +114,25 @@ fn player_mouse_look(
     camera_query: Query<(&GlobalTransform, &Camera)>,
     player_query: Query<&Transform, With<Player>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut action_state: ResMut<ActionState<PlayerAction>>,
+    mut action_state: ResMut<ActionState<PlayerAction>>
 ) {
     let (camera_transform, camera) = camera_query.get_single().expect("Need a single camera");
     let player_transform = player_query.get_single().expect("Need a single player");
-    let window = window_query
-        .get_single()
-        .expect("Need a single primary window");
+    let window = window_query.get_single().expect("Need a single primary window");
 
     // Many steps can fail here, so we'll wrap in an option pipeline
     // First check if the cursor is in window
     // Then check if the ray intersects the plane defined by the player
     // Then finally compute the point along the ray to look at
     let player_position = player_transform.translation;
-    if let Some(p) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .and_then(|ray| Some(ray).zip(ray.intersect_plane(player_position, Plane3d::new(Vec3::Y))))
-        .map(|(ray, p)| ray.get_point(p))
+    if
+        let Some(p) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .and_then(|ray|
+                Some(ray).zip(ray.intersect_plane(player_position, Plane3d::new(Vec3::Y)))
+            )
+            .map(|(ray, p)| ray.get_point(p))
     {
         let diff = (p - player_position).xz();
         if diff.length_squared() > 1e-3f32 {
@@ -155,27 +153,21 @@ fn player_mouse_look(
 fn control_player(
     time: Res<Time>,
     action_state: Res<ActionState<PlayerAction>>,
-    mut query: Query<&mut Transform, With<Player>>,
+    mut query: Query<&mut Transform, With<Player>>
 ) {
     let mut player_transform = query.single_mut();
     if action_state.pressed(&PlayerAction::Move) {
         // Note: In a real game we'd feed this into an actual player controller
         // and respects the camera extrinsics to ensure the direction is correct
-        let move_delta = time.delta_seconds()
-            * action_state
-                .clamped_axis_pair(&PlayerAction::Move)
-                .unwrap()
-                .xy();
+        let move_delta =
+            time.delta_seconds() *
+            action_state.clamped_axis_pair(&PlayerAction::Move).unwrap().xy();
         player_transform.translation += Vec3::new(move_delta.x, 0.0, move_delta.y);
         println!("Player moved to: {}", player_transform.translation.xz());
     }
 
     if action_state.pressed(&PlayerAction::Look) {
-        let look = action_state
-            .axis_pair(&PlayerAction::Look)
-            .unwrap()
-            .xy()
-            .normalize();
+        let look = action_state.axis_pair(&PlayerAction::Look).unwrap().xy().normalize();
         println!("Player looking in direction: {}", look);
     }
 
@@ -192,8 +184,10 @@ struct Player;
 fn setup_scene(mut commands: Commands) {
     // We need a camera
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 10.0, 15.0)
-            .looking_at(Vec3::new(0.0, 0.0, 0.0), Vec3::Y),
+        transform: Transform::from_xyz(0.0, 10.0, 15.0).looking_at(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::Y
+        ),
         ..default()
     });
 

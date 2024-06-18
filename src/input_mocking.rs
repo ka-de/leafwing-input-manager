@@ -9,22 +9,22 @@
 //! Each passing down the supplied arguments to the next.
 
 use bevy::ecs::system::SystemState;
-use bevy::input::gamepad::{Gamepad, GamepadButton, GamepadButtonType, GamepadEvent};
-use bevy::input::gamepad::{GamepadAxisChangedEvent, GamepadButtonChangedEvent};
-use bevy::input::keyboard::{Key, KeyCode, KeyboardInput, NativeKey};
-use bevy::input::mouse::{MouseButton, MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel};
-use bevy::input::touch::{TouchInput, Touches};
-use bevy::input::{ButtonInput, ButtonState};
-use bevy::prelude::{App, Entity, Events, GamepadAxisType, ResMut, Vec2, World};
+use bevy::input::gamepad::{ Gamepad, GamepadButton, GamepadButtonType, GamepadEvent };
+use bevy::input::gamepad::{ GamepadAxisChangedEvent, GamepadButtonChangedEvent };
+use bevy::input::keyboard::{ Key, KeyCode, KeyboardInput, NativeKey };
+use bevy::input::mouse::{ MouseButton, MouseButtonInput, MouseMotion, MouseScrollUnit, MouseWheel };
+use bevy::input::touch::{ TouchInput, Touches };
+use bevy::input::{ ButtonInput, ButtonState };
+use bevy::prelude::{ App, Entity, Events, GamepadAxisType, ResMut, Vec2, World };
 use bevy::window::CursorMoved;
 
 use crate::axislike::AxisType;
 #[cfg(feature = "ui")]
-use bevy::ecs::{component::Component, query::With, system::Query};
+use bevy::ecs::{ component::Component, query::With, system::Query };
 #[cfg(feature = "ui")]
 use bevy::ui::Interaction;
 
-use crate::input_streams::{InputStreams, MutableInputStreams};
+use crate::input_streams::{ InputStreams, MutableInputStreams };
 use crate::user_input::*;
 
 /// Send fake input events for testing purposes
@@ -43,9 +43,9 @@ use crate::user_input::*;
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::axislike::MouseMotionAxisType;
-/// use leafwing_input_manager::input_mocking::MockInput;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::axislike::MouseMotionAxisType;
+/// use input_manager::input_mocking::MockInput;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 ///
@@ -141,7 +141,7 @@ pub trait MockInput {
     fn send_axis_values(
         &mut self,
         input: impl Into<UserInput>,
-        values: impl IntoIterator<Item = f32>,
+        values: impl IntoIterator<Item = f32>
     );
 
     /// Simulates axis value changed events for the given `input`, using the specified `gamepad`.
@@ -161,7 +161,7 @@ pub trait MockInput {
         &mut self,
         input: impl Into<UserInput>,
         values: impl IntoIterator<Item = f32>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     );
 
     /// Simulates a released or deactivated event for the given `input`.
@@ -195,8 +195,8 @@ pub trait MockInput {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::input_mocking::QueryInput;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::input_mocking::QueryInput;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 ///
@@ -246,7 +246,7 @@ pub trait QueryInput {
     fn read_axis_values_on_gamepad(
         &self,
         input: impl Into<UserInput>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) -> Vec<f32>;
 }
 
@@ -306,7 +306,7 @@ impl MockInput for MutableInputStreams<'_> {
     fn send_axis_values(
         &mut self,
         input: impl Into<UserInput>,
-        values: impl IntoIterator<Item = f32>,
+        values: impl IntoIterator<Item = f32>
     ) {
         self.send_axis_values_as_gamepad(input, values, self.guess_gamepad())
     }
@@ -315,7 +315,7 @@ impl MockInput for MutableInputStreams<'_> {
         &mut self,
         input: impl Into<UserInput>,
         values: impl IntoIterator<Item = f32>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) {
         let raw_inputs = input.into().raw_inputs();
         let mut value_iter = values.into_iter();
@@ -429,7 +429,7 @@ impl MutableInputStreams<'_> {
         &mut self,
         gamepad: Gamepad,
         button_type: &GamepadButtonType,
-        state: ButtonState,
+        state: ButtonState
     ) {
         let value = f32::from(state == ButtonState::Pressed);
         let event = GamepadButtonChangedEvent::new(gamepad, *button_type, value);
@@ -440,7 +440,7 @@ impl MutableInputStreams<'_> {
         &mut self,
         gamepad: Gamepad,
         axis_type: &GamepadAxisType,
-        value: f32,
+        value: f32
     ) {
         let event = GamepadAxisChangedEvent::new(gamepad, *axis_type, value);
         self.gamepad_events.send(GamepadEvent::Axis(event));
@@ -475,7 +475,7 @@ impl QueryInput for InputStreams<'_> {
     fn read_axis_values_on_gamepad(
         &self,
         input: impl Into<UserInput>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) -> Vec<f32> {
         let mut input_streams = self.clone();
         input_streams.associated_gamepad = gamepad;
@@ -500,7 +500,7 @@ impl MockInput for World {
     fn send_axis_values(
         &mut self,
         input: impl Into<UserInput>,
-        values: impl IntoIterator<Item = f32>,
+        values: impl IntoIterator<Item = f32>
     ) {
         let mut mutable_input_streams = MutableInputStreams::from_world(self, None);
 
@@ -511,7 +511,7 @@ impl MockInput for World {
         &mut self,
         input: impl Into<UserInput>,
         values: impl IntoIterator<Item = f32>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) {
         let mut mutable_input_streams = MutableInputStreams::from_world(self, gamepad);
 
@@ -542,11 +542,13 @@ impl MockInput for World {
             }
         }
 
-        let mut input_system_state: SystemState<(
-            Option<ResMut<ButtonInput<GamepadButton>>>,
-            Option<ResMut<ButtonInput<KeyCode>>>,
-            Option<ResMut<ButtonInput<MouseButton>>>,
-        )> = SystemState::new(self);
+        let mut input_system_state: SystemState<
+            (
+                Option<ResMut<ButtonInput<GamepadButton>>>,
+                Option<ResMut<ButtonInput<KeyCode>>>,
+                Option<ResMut<ButtonInput<MouseButton>>>,
+            )
+        > = SystemState::new(self);
 
         let (maybe_gamepad, maybe_keyboard, maybe_mouse) = input_system_state.get_mut(self);
 
@@ -593,7 +595,7 @@ impl QueryInput for World {
     fn read_axis_values_on_gamepad(
         &self,
         input: impl Into<UserInput>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) -> Vec<f32> {
         let input_streams = InputStreams::from_world(self, gamepad);
 
@@ -632,7 +634,7 @@ impl MockInput for App {
     fn send_axis_values(
         &mut self,
         input: impl Into<UserInput>,
-        values: impl IntoIterator<Item = f32>,
+        values: impl IntoIterator<Item = f32>
     ) {
         self.world.send_axis_values(input, values);
     }
@@ -641,10 +643,9 @@ impl MockInput for App {
         &mut self,
         input: impl Into<UserInput>,
         values: impl IntoIterator<Item = f32>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) {
-        self.world
-            .send_axis_values_as_gamepad(input, values, gamepad);
+        self.world.send_axis_values_as_gamepad(input, values, gamepad);
     }
 
     fn release_input(&mut self, input: impl Into<UserInput>) {
@@ -676,7 +677,7 @@ impl QueryInput for App {
     fn read_axis_values_on_gamepad(
         &self,
         input: impl Into<UserInput>,
-        gamepad: Option<Gamepad>,
+        gamepad: Option<Gamepad>
     ) -> Vec<f32> {
         self.world.read_axis_values_on_gamepad(input, gamepad)
     }
@@ -695,10 +696,13 @@ impl MockUIInteraction for App {
 
 #[cfg(test)]
 mod test {
-    use crate::input_mocking::{MockInput, QueryInput};
-    use crate::prelude::{DualAxis, SingleAxis};
+    use crate::input_mocking::{ MockInput, QueryInput };
+    use crate::prelude::{ DualAxis, SingleAxis };
     use bevy::input::gamepad::{
-        GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo,
+        GamepadConnection,
+        GamepadConnectionEvent,
+        GamepadEvent,
+        GamepadInfo,
     };
     use bevy::input::InputPlugin;
     use bevy::prelude::*;
@@ -709,12 +713,14 @@ mod test {
 
         let gamepad = Gamepad::new(0);
         let mut gamepad_events = app.world.resource_mut::<Events<GamepadEvent>>();
-        gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-            gamepad,
-            connection: GamepadConnection::Connected(GamepadInfo {
-                name: "TestController".into(),
-            }),
-        }));
+        gamepad_events.send(
+            GamepadEvent::Connection(GamepadConnectionEvent {
+                gamepad,
+                connection: GamepadConnection::Connected(GamepadInfo {
+                    name: "TestController".into(),
+                }),
+            })
+        );
         app.update();
         app.update();
 
@@ -870,7 +876,7 @@ mod test {
 
         let mut interaction_query = app.world.query::<&Interaction>();
         for interaction in interaction_query.iter(&app.world) {
-            assert_eq!(*interaction, Interaction::None)
+            assert_eq!(*interaction, Interaction::None);
         }
 
         // Hover over the button
@@ -890,7 +896,7 @@ mod test {
 
         let mut interaction_query = app.world.query::<&Interaction>();
         for interaction in interaction_query.iter(&app.world) {
-            assert_eq!(*interaction, Interaction::None)
+            assert_eq!(*interaction, Interaction::None);
         }
     }
 }

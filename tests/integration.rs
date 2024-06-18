@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum Action {
@@ -13,7 +13,7 @@ struct Respect(bool);
 fn pay_respects(
     action_state_query: Query<&ActionState<Action>, With<Player>>,
     action_state_resource: Option<Res<ActionState<Action>>>,
-    mut respect: ResMut<Respect>,
+    mut respect: ResMut<Respect>
 ) {
     if let Ok(action_state) = action_state_query.get_single() {
         if action_state.pressed(&Action::PayRespects) {
@@ -42,10 +42,7 @@ struct Player;
 
 fn spawn_player(mut commands: Commands) {
     commands
-        .spawn(InputManagerBundle::with_map(InputMap::new([(
-            Action::PayRespects,
-            KeyCode::KeyF,
-        )])))
+        .spawn(InputManagerBundle::with_map(InputMap::new([(Action::PayRespects, KeyCode::KeyF)])))
         .insert(Player);
 }
 
@@ -62,10 +59,7 @@ fn disable_input() {
         .add_plugins(InputManagerPlugin::<Action>::default())
         .add_systems(Startup, spawn_player)
         .init_resource::<ActionState<Action>>()
-        .insert_resource(InputMap::<Action>::new([(
-            Action::PayRespects,
-            KeyCode::KeyF,
-        )]))
+        .insert_resource(InputMap::<Action>::new([(Action::PayRespects, KeyCode::KeyF)]))
         .init_resource::<Respect>()
         .add_systems(Update, pay_respects)
         .add_systems(PreUpdate, respect_fades);
@@ -86,8 +80,7 @@ fn disable_input() {
     assert_eq!(*respect, Respect(true));
 
     // Disable the player's input too
-    let mut action_state = app
-        .world
+    let mut action_state = app.world
         .query_filtered::<&mut ActionState<Action>, With<Player>>()
         .single_mut(&mut app.world);
     action_state.disable_all();
@@ -125,10 +118,7 @@ fn release_when_input_map_removed() {
         .add_plugins(InputManagerPlugin::<Action>::default())
         .add_systems(Startup, spawn_player)
         .init_resource::<ActionState<Action>>()
-        .insert_resource(InputMap::<Action>::new([(
-            Action::PayRespects,
-            KeyCode::KeyF,
-        )]))
+        .insert_resource(InputMap::<Action>::new([(Action::PayRespects, KeyCode::KeyF)]))
         .init_resource::<Respect>()
         .add_systems(Update, (pay_respects, remove_input_map))
         .add_systems(PreUpdate, respect_fades);
@@ -169,10 +159,9 @@ fn action_state_driver() {
 
     fn setup(mut commands: Commands) {
         let player_entity = commands
-            .spawn(InputManagerBundle::with_map(InputMap::new([(
-                Action::PayRespects,
-                KeyCode::KeyF,
-            )])))
+            .spawn(
+                InputManagerBundle::with_map(InputMap::new([(Action::PayRespects, KeyCode::KeyF)]))
+            )
             .insert(Player)
             .id();
 
@@ -237,11 +226,12 @@ fn duration() {
 
     fn hold_f_to_pay_respects(
         action_state: Res<ActionState<Action>>,
-        mut respect: ResMut<Respect>,
+        mut respect: ResMut<Respect>
     ) {
-        if action_state.pressed(&Action::PayRespects)
+        if
+            action_state.pressed(&Action::PayRespects) &&
             // Unrealistically disrespectful, but makes the tests faster
-            && action_state.current_duration(&Action::PayRespects) > RESPECTFUL_DURATION
+            action_state.current_duration(&Action::PayRespects) > RESPECTFUL_DURATION
         {
             respect.0 = true;
         }
@@ -254,10 +244,7 @@ fn duration() {
         .add_plugins(InputManagerPlugin::<Action>::default())
         .add_systems(Startup, spawn_player)
         .init_resource::<ActionState<Action>>()
-        .insert_resource(InputMap::<Action>::new([(
-            Action::PayRespects,
-            KeyCode::KeyF,
-        )]))
+        .insert_resource(InputMap::<Action>::new([(Action::PayRespects, KeyCode::KeyF)]))
         .init_resource::<Respect>()
         .add_systems(Update, hold_f_to_pay_respects);
 
@@ -272,8 +259,5 @@ fn duration() {
 
     // Check
     app.update();
-    assert!(app
-        .world
-        .resource::<ActionState<Action>>()
-        .pressed(&Action::PayRespects));
+    assert!(app.world.resource::<ActionState<Action>>().pressed(&Action::PayRespects));
 }

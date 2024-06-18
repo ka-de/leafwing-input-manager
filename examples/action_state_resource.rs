@@ -5,7 +5,7 @@
 //! and include it as a resource in a bevy app.
 
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -34,7 +34,7 @@ impl PlayerAction {
 
 fn move_player(
     // action_state is stored as a resource
-    action_state: Res<ActionState<PlayerAction>>,
+    action_state: Res<ActionState<PlayerAction>>
 ) {
     if action_state.pressed(&PlayerAction::Move) {
         // We're working with gamepads, so we want to defensively ensure that we're using the clamped values

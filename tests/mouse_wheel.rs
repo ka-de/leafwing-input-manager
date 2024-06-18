@@ -1,8 +1,8 @@
-use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
+use bevy::input::mouse::{ MouseScrollUnit, MouseWheel };
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::axislike::DualAxisData;
-use leafwing_input_manager::prelude::*;
+use input_manager::axislike::DualAxisData;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum ButtonlikeTestAction {
@@ -40,10 +40,7 @@ fn test_app() -> App {
 #[test]
 fn raw_mouse_wheel_events() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        ButtonlikeTestAction::Up,
-        MouseWheelDirection::Up,
-    )]));
+    app.insert_resource(InputMap::new([(ButtonlikeTestAction::Up, MouseWheelDirection::Up)]));
 
     let mut events = app.world.resource_mut::<Events<MouseWheel>>();
     events.send(MouseWheel {
@@ -100,12 +97,14 @@ fn mouse_wheel_dual_axis_mocking() {
 #[test]
 fn mouse_wheel_buttonlike() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (ButtonlikeTestAction::Up, MouseWheelDirection::Up),
-        (ButtonlikeTestAction::Down, MouseWheelDirection::Down),
-        (ButtonlikeTestAction::Left, MouseWheelDirection::Left),
-        (ButtonlikeTestAction::Right, MouseWheelDirection::Right),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (ButtonlikeTestAction::Up, MouseWheelDirection::Up),
+            (ButtonlikeTestAction::Down, MouseWheelDirection::Down),
+            (ButtonlikeTestAction::Left, MouseWheelDirection::Left),
+            (ButtonlikeTestAction::Right, MouseWheelDirection::Right),
+        ])
+    );
 
     for action in ButtonlikeTestAction::variants() {
         let input_map = app.world.resource::<InputMap<ButtonlikeTestAction>>();
@@ -123,12 +122,14 @@ fn mouse_wheel_buttonlike() {
 #[test]
 fn mouse_wheel_buttonlike_cancels() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (ButtonlikeTestAction::Up, MouseWheelDirection::Up),
-        (ButtonlikeTestAction::Down, MouseWheelDirection::Down),
-        (ButtonlikeTestAction::Left, MouseWheelDirection::Left),
-        (ButtonlikeTestAction::Right, MouseWheelDirection::Right),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (ButtonlikeTestAction::Up, MouseWheelDirection::Up),
+            (ButtonlikeTestAction::Down, MouseWheelDirection::Down),
+            (ButtonlikeTestAction::Left, MouseWheelDirection::Left),
+            (ButtonlikeTestAction::Right, MouseWheelDirection::Right),
+        ])
+    );
 
     app.press_input(MouseWheelDirection::Up);
     app.press_input(MouseWheelDirection::Down);
@@ -145,10 +146,12 @@ fn mouse_wheel_buttonlike_cancels() {
 #[test]
 fn mouse_wheel_single_axis() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (AxislikeTestAction::X, SingleAxis::mouse_wheel_x()),
-        (AxislikeTestAction::Y, SingleAxis::mouse_wheel_y()),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (AxislikeTestAction::X, SingleAxis::mouse_wheel_x()),
+            (AxislikeTestAction::Y, SingleAxis::mouse_wheel_y()),
+        ])
+    );
 
     // +X
     let input = SingleAxis::mouse_wheel_x();
@@ -196,10 +199,7 @@ fn mouse_wheel_single_axis() {
 #[test]
 fn mouse_wheel_dual_axis() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        DualAxis::mouse_wheel(),
-    )]));
+    app.insert_resource(InputMap::new([(AxislikeTestAction::XY, DualAxis::mouse_wheel())]));
 
     let input = DualAxis::mouse_wheel();
     app.send_axis_values(input, [5.0, 0.0]);
@@ -218,10 +218,7 @@ fn mouse_wheel_dual_axis() {
 #[test]
 fn mouse_wheel_virtualdpad() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        VirtualDPad::mouse_wheel(),
-    )]));
+    app.insert_resource(InputMap::new([(AxislikeTestAction::XY, VirtualDPad::mouse_wheel())]));
 
     let input = DualAxis::mouse_wheel();
     app.send_axis_values(input, [0.0, -2.0]);

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -36,11 +36,9 @@ fn spawn_player(mut commands: Commands) {
             // Add an AxisDeadzone to process horizontal values of the right stick.
             // This will trigger if the axis is moved 10% or more in either direction.
             Action::Rudder,
-            SingleAxis::new(GamepadAxisType::RightStickX).with_deadzone_symmetric(0.1),
+            SingleAxis::new(GamepadAxisType::RightStickX).with_deadzone_symmetric(0.1)
         );
-    commands
-        .spawn(InputManagerBundle::with_map(input_map))
-        .insert(Player);
+    commands.spawn(InputManagerBundle::with_map(input_map)).insert(Player);
 }
 
 // Query for the `ActionState` component in your game logic systems!

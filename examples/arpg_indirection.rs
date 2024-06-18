@@ -7,8 +7,8 @@
 
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-use leafwing_input_manager::plugin::InputManagerSystem;
-use leafwing_input_manager::prelude::*;
+use input_manager::plugin::InputManagerSystem;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -19,10 +19,7 @@ fn main() {
         .add_plugins(InputManagerPlugin::<Ability>::default())
         .add_systems(Startup, spawn_player)
         // This system coordinates the state of our two actions
-        .add_systems(
-            PreUpdate,
-            copy_action_state.after(InputManagerSystem::ManualControl),
-        )
+        .add_systems(PreUpdate, copy_action_state.after(InputManagerSystem::ManualControl))
         // Try it out, using QWER / left-click / right-click!
         .add_systems(Update, report_abilities_used)
         .run();
@@ -42,9 +39,7 @@ impl Slot {
     /// You could use the `strum` crate to derive this automatically!
     fn variants() -> impl Iterator<Item = Slot> {
         use Slot::*;
-        [Primary, Secondary, Ability1, Ability2, Ability3, Ability4]
-            .iter()
-            .copied()
+        [Primary, Secondary, Ability1, Ability2, Ability3, Ability4].iter().copied()
     }
 }
 
@@ -101,8 +96,8 @@ fn spawn_player(mut commands: Commands) {
             (Slot::Ability3, KeyE),
             (Slot::Ability4, KeyR),
         ])
-        .with(Slot::Primary, MouseButton::Left)
-        .with(Slot::Secondary, MouseButton::Right),
+            .with(Slot::Primary, MouseButton::Left)
+            .with(Slot::Secondary, MouseButton::Right),
         slot_action_state: ActionState::default(),
         ability_action_state: ActionState::default(),
         ability_slot_map,
@@ -110,11 +105,7 @@ fn spawn_player(mut commands: Commands) {
 }
 
 fn copy_action_state(
-    mut query: Query<(
-        &mut ActionState<Slot>,
-        &mut ActionState<Ability>,
-        &AbilitySlotMap,
-    )>,
+    mut query: Query<(&mut ActionState<Slot>, &mut ActionState<Ability>, &AbilitySlotMap)>
 ) {
     for (mut slot_state, mut ability_state, ability_slot_map) in query.iter_mut() {
         for slot in Slot::variants() {
@@ -123,7 +114,7 @@ fn copy_action_state(
                 // including information about how long the buttons have been pressed or released
                 ability_state.set_action_data(
                     *matching_ability,
-                    slot_state.action_data_mut_or_default(&slot).clone(),
+                    slot_state.action_data_mut_or_default(&slot).clone()
                 );
             }
         }

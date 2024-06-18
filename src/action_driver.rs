@@ -6,10 +6,7 @@ use crate::action_state::ActionState;
 use bevy::utils::hashbrown::hash_set::Iter;
 use std::iter::Once;
 
-use bevy::{
-    ecs::{component::Component, entity::Entity},
-    utils::HashSet,
-};
+use bevy::{ ecs::{ component::Component, entity::Entity }, utils::HashSet };
 
 use crate::Actionlike;
 
@@ -22,7 +19,7 @@ use crate::Actionlike;
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Reflect)]
 /// enum DanceDance {
@@ -104,7 +101,7 @@ impl ActionStateDriverTarget {
     #[inline(always)]
     pub fn add(&mut self, entities: impl Iterator<Item = Entity>) {
         for entity in entities {
-            self.insert(entity)
+            self.insert(entity);
         }
     }
 
@@ -233,15 +230,7 @@ mod tests {
         target = target.without(Entity::from_raw(0));
         assert_eq!(0, target.len());
 
-        target.add(
-            [
-                Entity::from_raw(0),
-                Entity::from_raw(1),
-                Entity::from_raw(2),
-            ]
-            .iter()
-            .cloned(),
-        );
+        target.add([Entity::from_raw(0), Entity::from_raw(1), Entity::from_raw(2)].iter().cloned());
         assert_eq!(3, target.len());
 
         let mut sum = 0;

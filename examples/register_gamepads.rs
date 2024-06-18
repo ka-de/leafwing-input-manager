@@ -1,7 +1,7 @@
 //! Demonstrates how to register gamepads in local multiplayer fashion
 
-use bevy::{prelude::*, utils::HashMap};
-use leafwing_input_manager::prelude::*;
+use bevy::{ prelude::*, utils::HashMap };
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -32,13 +32,14 @@ fn join(
     mut commands: Commands,
     mut joined_players: ResMut<JoinedPlayers>,
     gamepads: Res<Gamepads>,
-    button_inputs: Res<ButtonInput<GamepadButton>>,
+    button_inputs: Res<ButtonInput<GamepadButton>>
 ) {
     for gamepad in gamepads.iter() {
         // Join the game when both bumpers (L+R) on the controller are pressed
         // We drop down the Bevy's input to get the input from each gamepad
-        if button_inputs.pressed(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger))
-            && button_inputs.pressed(GamepadButton::new(gamepad, GamepadButtonType::RightTrigger))
+        if
+            button_inputs.pressed(GamepadButton::new(gamepad, GamepadButtonType::LeftTrigger)) &&
+            button_inputs.pressed(GamepadButton::new(gamepad, GamepadButtonType::RightTrigger))
         {
             // Make sure a player cannot join twice
             if !joined_players.0.contains_key(&gamepad) {
@@ -48,8 +49,8 @@ fn join(
                     (Action::Jump, GamepadButtonType::South),
                     (Action::Disconnect, GamepadButtonType::Select),
                 ])
-                // Make sure to set the gamepad or all gamepads will be used!
-                .with_gamepad(gamepad);
+                    // Make sure to set the gamepad or all gamepads will be used!
+                    .with_gamepad(gamepad);
                 let player = commands
                     .spawn(InputManagerBundle::with_map(input_map))
                     .insert(Player { gamepad })
@@ -75,7 +76,7 @@ fn jump(action_query: Query<(&ActionState<Action>, &Player)>) {
 fn disconnect(
     mut commands: Commands,
     action_query: Query<(&ActionState<Action>, &Player)>,
-    mut joined_players: ResMut<JoinedPlayers>,
+    mut joined_players: ResMut<JoinedPlayers>
 ) {
     for (action_state, player) in action_query.iter() {
         if action_state.pressed(&Action::Disconnect) {

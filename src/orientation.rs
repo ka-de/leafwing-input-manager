@@ -5,10 +5,10 @@ pub use rotation::Rotation;
 pub use rotation_direction::RotationDirection;
 
 mod orientation_trait {
-    use super::{Rotation, RotationDirection};
+    use super::{ Rotation, RotationDirection };
     use bevy::math::primitives::Direction2d;
     use bevy::math::Quat;
-    use bevy::transform::components::{GlobalTransform, Transform};
+    use bevy::transform::components::{ GlobalTransform, Transform };
     use core::fmt::Debug;
 
     /// A type that can represent an orientation in 2D space
@@ -20,7 +20,7 @@ mod orientation_trait {
         ///
         /// # Example
         /// ```rust
-        /// use leafwing_input_manager::orientation::{Orientation, Rotation};
+        /// use input_manager::orientation::{Orientation, Rotation};
         /// use bevy::math::primitives::Direction2d;
         ///
         /// Direction2d::Y.distance(Direction2d::from_xy(-1.0, -1.0).unwrap()).assert_approx_eq(Rotation::from_degrees(135.));
@@ -51,7 +51,7 @@ mod orientation_trait {
         ///
         /// # Example
         /// ```rust
-        /// use leafwing_input_manager::orientation::{Orientation, RotationDirection};
+        /// use input_manager::orientation::{Orientation, RotationDirection};
         /// use bevy::math::primitives::Direction2d;
         ///
         /// assert_eq!(Direction2d::Y.rotation_direction(Direction2d::Y), RotationDirection::Clockwise);
@@ -71,8 +71,7 @@ mod orientation_trait {
 
             let rotation_to = target_rotation - self_rotation;
 
-            if rotation_to.micro_degrees == 0 || rotation_to.micro_degrees >= Rotation::HALF_CIRCLE
-            {
+            if rotation_to.micro_degrees == 0 || rotation_to.micro_degrees >= Rotation::HALF_CIRCLE {
                 RotationDirection::Clockwise
             } else {
                 RotationDirection::CounterClockwise
@@ -83,7 +82,7 @@ mod orientation_trait {
         ///
         /// # Example
         /// ```rust
-        /// use leafwing_input_manager::orientation::{Rotation, Orientation};
+        /// use input_manager::orientation::{Rotation, Orientation};
         ///
         /// let mut rotation = Rotation::SOUTH;
         ///
@@ -159,7 +158,7 @@ mod rotation_direction {
     ///
     /// # Example
     /// ```rust
-    /// use leafwing_input_manager::orientation::{Orientation, Rotation, RotationDirection};
+    /// use input_manager::orientation::{Orientation, Rotation, RotationDirection};
     ///
     /// assert_eq!(Rotation::NORTH.rotation_direction(Rotation::NORTH), RotationDirection::Clockwise);
     /// assert_eq!(Rotation::NORTH.rotation_direction(Rotation::EAST), RotationDirection::Clockwise);
@@ -206,7 +205,7 @@ mod rotation {
     use crate::errors::NearlySingularConversion;
     use bevy::ecs::prelude::Component;
     use bevy::math::Vec2;
-    use core::ops::{Add, AddAssign, Div, Mul, Neg, Sub, SubAssign};
+    use core::ops::{ Add, AddAssign, Div, Mul, Neg, Sub, SubAssign };
     use derive_more::Display;
     use std::f32::consts::TAU;
 
@@ -217,7 +216,7 @@ mod rotation {
     ///
     /// # Example
     /// ```rust
-    /// use leafwing_input_manager::orientation::{Rotation, Orientation};
+    /// use input_manager::orientation::{Rotation, Orientation};
     /// use bevy::math::primitives::Direction2d;
     /// use core::f32::consts::{FRAC_PI_2, PI, TAU};
     ///
@@ -311,7 +310,7 @@ mod rotation {
         /// # Example
         /// ```rust
         /// use bevy::math::Vec2;
-        /// use leafwing_input_manager::orientation::Rotation;
+        /// use input_manager::orientation::Rotation;
         ///
         /// assert_eq!(Rotation::from_xy(Vec2::new(0.0, 1.0)), Ok(Rotation::NORTH));
         /// ```
@@ -341,7 +340,7 @@ mod rotation {
             let normalized_radians = radians.into().rem_euclid(TAU);
 
             Rotation {
-                micro_degrees: (normalized_radians * (Rotation::FULL_CIRCLE as f32 / TAU)) as u32,
+                micro_degrees: (normalized_radians * ((Rotation::FULL_CIRCLE as f32) / TAU)) as u32,
             }
         }
 
@@ -349,7 +348,7 @@ mod rotation {
         #[inline]
         #[must_use]
         pub fn into_radians(self) -> f32 {
-            self.micro_degrees as f32 * (TAU / Rotation::FULL_CIRCLE as f32)
+            (self.micro_degrees as f32) * (TAU / (Rotation::FULL_CIRCLE as f32))
         }
 
         /// Construct a [`Rotation`] from degrees, measured counterclockwise from the positive x-axis
@@ -359,7 +358,7 @@ mod rotation {
             let normalized_degrees: f32 = degrees.into().rem_euclid(360.0);
 
             Rotation {
-                micro_degrees: (normalized_degrees * Rotation::DEGREE as f32) as u32,
+                micro_degrees: (normalized_degrees * (Rotation::DEGREE as f32)) as u32,
             }
         }
 
@@ -376,14 +375,14 @@ mod rotation {
         #[inline]
         #[must_use]
         pub fn into_degrees(self) -> f32 {
-            self.micro_degrees as f32 / Rotation::DEGREE as f32
+            (self.micro_degrees as f32) / (Rotation::DEGREE as f32)
         }
 
         /// Calculates the difference in micro-degrees between `self` and `rhs`.
         #[inline]
         #[must_use]
         pub(crate) fn micro_degrees_between(&self, rhs: Self) -> u32 {
-            (self.micro_degrees as i32 - rhs.micro_degrees as i32).unsigned_abs()
+            ((self.micro_degrees as i32) - (rhs.micro_degrees as i32)).unsigned_abs()
         }
 
         /// Returns the negation of the given micro-degrees.
@@ -474,8 +473,8 @@ mod conversions {
     use super::Rotation;
     use crate::errors::NearlySingularConversion;
     use bevy::math::primitives::Direction2d;
-    use bevy::math::{Quat, Vec2, Vec3};
-    use bevy::transform::components::{GlobalTransform, Transform};
+    use bevy::math::{ Quat, Vec2, Vec3 };
+    use bevy::transform::components::{ GlobalTransform, Transform };
 
     impl From<Rotation> for Direction2d {
         fn from(rotation: Rotation) -> Direction2d {
@@ -522,8 +521,11 @@ mod conversions {
 
     impl From<Quat> for Rotation {
         fn from(quaternion: Quat) -> Rotation {
-            let direction: Direction2d =
-                quaternion.mul_vec3(Vec3::X).truncate().try_into().unwrap();
+            let direction: Direction2d = quaternion
+                .mul_vec3(Vec3::X)
+                .truncate()
+                .try_into()
+                .unwrap();
             direction.into()
         }
     }

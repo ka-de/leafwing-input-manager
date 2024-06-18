@@ -1,10 +1,10 @@
 //! Processors for single-axis input values
 
-use std::hash::{Hash, Hasher};
+use std::hash::{ Hash, Hasher };
 
 use bevy::prelude::Reflect;
 use bevy::utils::FloatOrd;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 
 pub use self::custom::*;
 pub use self::range::*;
@@ -22,7 +22,7 @@ pub enum AxisProcessor {
     /// similar to [`f32::signum()`] but returning `0.0` for zero values.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // 1.0 for positive values
     /// assert_eq!(AxisProcessor::Digital.process(2.5), 1.0);
@@ -41,7 +41,7 @@ pub enum AxisProcessor {
     /// Flips the sign of input values, resulting in a directional reversal of control.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// assert_eq!(AxisProcessor::Inverted.process(2.5), -2.5);
     /// assert_eq!(AxisProcessor::Inverted.process(-2.5), 2.5);
@@ -51,7 +51,7 @@ pub enum AxisProcessor {
     /// Scales input values using a specified multiplier to fine-tune the responsiveness of control.
     ///
     /// ```rust
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // Doubled!
     /// assert_eq!(AxisProcessor::Sensitivity(2.0).process(2.0), 4.0);
@@ -84,11 +84,7 @@ impl AxisProcessor {
     pub fn process(&self, input_value: f32) -> f32 {
         match self {
             Self::Digital => {
-                if input_value == 0.0 {
-                    0.0
-                } else {
-                    input_value.signum()
-                }
+                if input_value == 0.0 { 0.0 } else { input_value.signum() }
             }
             Self::Inverted => -input_value,
             Self::Sensitivity(sensitivity) => sensitivity * input_value,
@@ -125,7 +121,7 @@ pub trait WithAxisProcessingPipelineExt: Sized {
     /// Replaces the current processing pipeline with the given [`AxisProcessor`]s.
     fn replace_processing_pipeline(
         self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self;
 
     /// Appends the given [`AxisProcessor`] as the next processing step.
@@ -210,7 +206,7 @@ mod tests {
     #[test]
     fn test_axis_inversion_processor() {
         for value in -300..300 {
-            let value = value as f32 * 0.01;
+            let value = (value as f32) * 0.01;
 
             assert_eq!(AxisProcessor::Inverted.process(value), -value);
             assert_eq!(AxisProcessor::Inverted.process(-value), value);
@@ -220,10 +216,10 @@ mod tests {
     #[test]
     fn test_axis_sensitivity_processor() {
         for value in -300..300 {
-            let value = value as f32 * 0.01;
+            let value = (value as f32) * 0.01;
 
             for sensitivity in -300..300 {
-                let sensitivity = sensitivity as f32 * 0.01;
+                let sensitivity = (sensitivity as f32) * 0.01;
 
                 let processor = AxisProcessor::Sensitivity(sensitivity);
                 assert_eq!(processor.process(value), sensitivity * value);

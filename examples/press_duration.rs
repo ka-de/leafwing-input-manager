@@ -3,8 +3,8 @@
 //!
 //! Press Left / Right or A / D to move your character to the left and right!
 
-use bevy::{prelude::*, window::PrimaryWindow};
-use leafwing_input_manager::prelude::*;
+use bevy::{ prelude::*, window::PrimaryWindow };
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -112,7 +112,7 @@ fn drag(mut query: Query<&mut Velocity>, time: Res<Time>) {
 
 fn wall_collisions(
     mut query: Query<(&Transform, &mut Velocity)>,
-    windows: Query<&Window, With<PrimaryWindow>>,
+    windows: Query<&Window, With<PrimaryWindow>>
 ) {
     let window_width = windows.single().width();
     let left_side = 0.0 - window_width / 2.0;

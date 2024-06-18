@@ -1,7 +1,7 @@
 //! Demonstrates how to connect `bevy::ui` buttons to [`ActionState`] components using the [`ActionStateDriver`] component on your button
 
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -32,7 +32,7 @@ fn spawn_player(mut commands: Commands) {
     commands
         .spawn(SpriteBundle {
             transform: Transform {
-                scale: Vec3::new(100., 100., 1.0),
+                scale: Vec3::new(100.0, 100.0, 1.0),
                 ..Default::default()
             },
             sprite: Sprite {
@@ -109,10 +109,10 @@ fn move_player(mut query: Query<(&ActionState<Action>, &mut Transform), With<Pla
     // use `.just_pressed` instead.
     // To trigger when the click is released, use `.just_released`
     if action_state.pressed(&Action::Left) {
-        transform.translation.x -= 10.;
+        transform.translation.x -= 10.0;
     }
 
     if action_state.pressed(&Action::Right) {
-        transform.translation.x += 10.;
+        transform.translation.x += 10.0;
     }
 }

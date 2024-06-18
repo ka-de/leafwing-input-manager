@@ -1,16 +1,16 @@
 //! Handles clashing inputs into a [`InputMap`] in a configurable fashion.
 
 use crate::action_state::ActionData;
-use crate::axislike::{VirtualAxis, VirtualDPad};
+use crate::axislike::{ VirtualAxis, VirtualDPad };
 use crate::input_map::InputMap;
 use crate::input_streams::InputStreams;
-use crate::user_input::{InputKind, UserInput};
+use crate::user_input::{ InputKind, UserInput };
 use crate::Actionlike;
 
 use bevy::prelude::Resource;
 use bevy::utils::HashMap;
 use itertools::Itertools;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use std::cmp::Ordering;
 
 /// How should clashing inputs by handled by an [`InputMap`]?
@@ -74,9 +74,7 @@ impl UserInput {
             (Chord(self_chord), VirtualAxis(other_axis)) => {
                 virtual_axis_chord_clash(other_axis, self_chord)
             }
-            _ => self
-                .iter()
-                .any(|self_input| other.iter().contains(&self_input)),
+            _ => self.iter().any(|self_input| other.iter().contains(&self_input)),
         }
     }
 }
@@ -89,7 +87,7 @@ impl<A: Actionlike> InputMap<A> {
         &self,
         action_data: &mut HashMap<A, ActionData>,
         input_streams: &InputStreams,
-        clash_strategy: ClashStrategy,
+        clash_strategy: ClashStrategy
     ) {
         for clash in self.get_clashes(action_data, input_streams) {
             // Remove the action in the pair that was overruled, if any
@@ -121,7 +119,7 @@ impl<A: Actionlike> InputMap<A> {
     fn get_clashes(
         &self,
         action_data: &HashMap<A, ActionData>,
-        input_streams: &InputStreams,
+        input_streams: &InputStreams
     ) -> Vec<Clash<A>> {
         let mut clashes = Vec::default();
 
@@ -136,7 +134,7 @@ impl<A: Actionlike> InputMap<A> {
             if pressed(&clash.action_a) && pressed(&clash.action_b) {
                 // Check if the potential clash occurred based on the pressed inputs
                 if let Some(clash) = check_clash(&clash, input_streams) {
-                    clashes.push(clash)
+                    clashes.push(clash);
                 }
             }
         }
@@ -195,18 +193,14 @@ fn button_chord_clash(button: &InputKind, chord: &[InputKind]) -> bool {
 // Does the `dpad` clash with the `chord`?
 #[must_use]
 fn dpad_chord_clash(dpad: &VirtualDPad, chord: &[InputKind]) -> bool {
-    chord.len() > 1
-        && chord
-            .iter()
-            .any(|button| [&dpad.up, &dpad.down, &dpad.left, &dpad.right].contains(&button))
+    chord.len() > 1 &&
+        chord.iter().any(|button| [&dpad.up, &dpad.down, &dpad.left, &dpad.right].contains(&button))
 }
 
 #[must_use]
 fn virtual_axis_chord_clash(axis: &VirtualAxis, chord: &[InputKind]) -> bool {
-    chord.len() > 1
-        && chord
-            .iter()
-            .any(|button| *button == axis.negative || *button == axis.positive)
+    chord.len() > 1 &&
+        chord.iter().any(|button| (*button == axis.negative || *button == axis.positive))
 }
 
 /// Does the `chord_a` clash with `chord_b`?
@@ -228,17 +222,9 @@ fn check_clash<A: Actionlike>(clash: &Clash<A>, input_streams: &InputStreams) ->
     let mut actual_clash: Clash<A> = clash.clone();
 
     // For all inputs actually pressed that match action A
-    for input_a in clash
-        .inputs_a
-        .iter()
-        .filter(|&input| input_streams.input_pressed(input))
-    {
+    for input_a in clash.inputs_a.iter().filter(|&input| input_streams.input_pressed(input)) {
         // For all inputs actually pressed that match action B
-        for input_b in clash
-            .inputs_b
-            .iter()
-            .filter(|&input| input_streams.input_pressed(input))
-        {
+        for input_b in clash.inputs_b.iter().filter(|&input| input_streams.input_pressed(input)) {
             // If a clash was detected,
             if input_a.clashes(input_b) {
                 actual_clash.inputs_a.push(input_a.clone());
@@ -256,17 +242,15 @@ fn check_clash<A: Actionlike>(clash: &Clash<A>, input_streams: &InputStreams) ->
 fn resolve_clash<A: Actionlike>(
     clash: &Clash<A>,
     clash_strategy: ClashStrategy,
-    input_streams: &InputStreams,
+    input_streams: &InputStreams
 ) -> Option<A> {
     // Figure out why the actions are pressed
-    let reasons_a_is_pressed: Vec<&UserInput> = clash
-        .inputs_a
+    let reasons_a_is_pressed: Vec<&UserInput> = clash.inputs_a
         .iter()
         .filter(|&input| input_streams.input_pressed(input))
         .collect();
 
-    let reasons_b_is_pressed: Vec<&UserInput> = clash
-        .inputs_b
+    let reasons_b_is_pressed: Vec<&UserInput> = clash.inputs_b
         .iter()
         .filter(|&input| input_streams.input_pressed(input))
         .collect();
@@ -312,11 +296,11 @@ fn resolve_clash<A: Actionlike>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use bevy::app::App;
     use bevy::input::keyboard::KeyCode::*;
     use bevy::prelude::Reflect;
-    use leafwing_input_manager_macros::Actionlike;
+    use input_manager_macros::Actionlike;
 
     #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     enum Action {
@@ -345,16 +329,13 @@ mod tests {
         input_map.insert_chord(CtrlOne, [ControlLeft, Digit1]);
         input_map.insert_chord(AltOne, [AltLeft, Digit1]);
         input_map.insert_chord(CtrlAltOne, [ControlLeft, AltLeft, Digit1]);
-        input_map.insert(
-            MoveDPad,
-            VirtualDPad {
-                up: ArrowUp.into(),
-                down: ArrowDown.into(),
-                left: ArrowLeft.into(),
-                right: ArrowRight.into(),
-                processors: Vec::new(),
-            },
-        );
+        input_map.insert(MoveDPad, VirtualDPad {
+            up: ArrowUp.into(),
+            down: ArrowDown.into(),
+            left: ArrowLeft.into(),
+            right: ArrowRight.into(),
+            processors: Vec::new(),
+        });
         input_map.insert_chord(CtrlUp, [ControlLeft, ArrowUp]);
 
         input_map
@@ -375,32 +356,29 @@ mod tests {
             let ab = UserInput::chord([KeyA, KeyB]);
             let bc = UserInput::chord([KeyB, KeyC]);
             let abc = UserInput::chord([KeyA, KeyB, KeyC]);
-            let axyz_dpad: UserInput = VirtualDPad {
+            let axyz_dpad: UserInput = (VirtualDPad {
                 up: KeyA.into(),
                 down: KeyX.into(),
                 left: KeyY.into(),
                 right: KeyZ.into(),
                 processors: Vec::new(),
-            }
-            .into();
-            let abcd_dpad: UserInput = VirtualDPad {
+            }).into();
+            let abcd_dpad: UserInput = (VirtualDPad {
                 up: KeyA.into(),
                 down: KeyB.into(),
                 left: KeyC.into(),
                 right: KeyD.into(),
                 processors: Vec::new(),
-            }
-            .into();
+            }).into();
 
             let ctrl_up: UserInput = UserInput::chord([ArrowUp, ControlLeft]);
-            let directions_dpad: UserInput = VirtualDPad {
+            let directions_dpad: UserInput = (VirtualDPad {
                 up: ArrowUp.into(),
                 down: ArrowDown.into(),
                 left: ArrowLeft.into(),
                 right: ArrowRight.into(),
                 processors: Vec::new(),
-            }
-            .into();
+            }).into();
 
             assert!(!a.clashes(&b));
             assert!(a.clashes(&ab));
@@ -433,9 +411,7 @@ mod tests {
         fn chord_chord_clash_construction() {
             let input_map = test_input_map();
 
-            let observed_clash = input_map
-                .possible_clash(&OneAndTwoAndThree, &OneAndTwo)
-                .unwrap();
+            let observed_clash = input_map.possible_clash(&OneAndTwoAndThree, &OneAndTwo).unwrap();
             let correct_clash = Clash {
                 action_a: OneAndTwoAndThree,
                 action_b: OneAndTwo,
@@ -454,9 +430,7 @@ mod tests {
             assert!(input_map.possible_clash(&One, &OneAndTwo).is_some());
             assert!(input_map.possible_clash(&One, &OneAndTwoAndThree).is_some());
             assert!(input_map.possible_clash(&One, &TwoAndThree).is_none());
-            assert!(input_map
-                .possible_clash(&OneAndTwo, &OneAndTwoAndThree)
-                .is_some());
+            assert!(input_map.possible_clash(&OneAndTwo, &OneAndTwoAndThree).is_some());
         }
 
         #[test]
@@ -473,38 +447,24 @@ mod tests {
             let input_streams = InputStreams::from_world(&app.world, None);
 
             assert_eq!(
-                resolve_clash(
-                    &simple_clash,
-                    ClashStrategy::PrioritizeLongest,
-                    &input_streams,
-                ),
+                resolve_clash(&simple_clash, ClashStrategy::PrioritizeLongest, &input_streams),
                 Some(One)
             );
 
             let reversed_clash = input_map.possible_clash(&OneAndTwo, &One).unwrap();
             assert_eq!(
-                resolve_clash(
-                    &reversed_clash,
-                    ClashStrategy::PrioritizeLongest,
-                    &input_streams,
-                ),
+                resolve_clash(&reversed_clash, ClashStrategy::PrioritizeLongest, &input_streams),
                 Some(One)
             );
 
-            let chord_clash = input_map
-                .possible_clash(&OneAndTwo, &OneAndTwoAndThree)
-                .unwrap();
+            let chord_clash = input_map.possible_clash(&OneAndTwo, &OneAndTwoAndThree).unwrap();
             app.press_input(Digit3);
             app.update();
 
             let input_streams = InputStreams::from_world(&app.world, None);
 
             assert_eq!(
-                resolve_clash(
-                    &chord_clash,
-                    ClashStrategy::PrioritizeLongest,
-                    &input_streams,
-                ),
+                resolve_clash(&chord_clash, ClashStrategy::PrioritizeLongest, &input_streams),
                 Some(OneAndTwo)
             );
         }
@@ -530,7 +490,7 @@ mod tests {
             input_map.handle_clashes(
                 &mut action_data,
                 &InputStreams::from_world(&app.world, None),
-                ClashStrategy::PrioritizeLongest,
+                ClashStrategy::PrioritizeLongest
             );
 
             let mut expected = HashMap::new();
@@ -559,7 +519,7 @@ mod tests {
             input_map.handle_clashes(
                 &mut action_data,
                 &InputStreams::from_world(&app.world, None),
-                ClashStrategy::PrioritizeLongest,
+                ClashStrategy::PrioritizeLongest
             );
 
             let mut expected = HashMap::new();
@@ -581,7 +541,7 @@ mod tests {
 
             let action_data = input_map.process_actions(
                 &InputStreams::from_world(&app.world, None),
-                ClashStrategy::PrioritizeLongest,
+                ClashStrategy::PrioritizeLongest
             );
 
             for (action, action_data) in action_data.iter() {

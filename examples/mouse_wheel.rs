@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -31,18 +31,16 @@ fn setup(mut commands: Commands) {
         .with(CameraMovement::Pan, VirtualDPad::mouse_wheel())
         // Or even a continuous `DualAxis`!
         .with(CameraMovement::Pan, DualAxis::mouse_wheel());
-    commands
-        .spawn(Camera2dBundle::default())
-        .insert(InputManagerBundle::with_map(input_map));
+    commands.spawn(Camera2dBundle::default()).insert(InputManagerBundle::with_map(input_map));
 
     commands.spawn(SpriteBundle {
-        transform: Transform::from_scale(Vec3::new(100., 100., 1.)),
+        transform: Transform::from_scale(Vec3::new(100.0, 100.0, 1.0)),
         ..default()
     });
 }
 
 fn zoom_camera(
-    mut query: Query<(&mut OrthographicProjection, &ActionState<CameraMovement>), With<Camera2d>>,
+    mut query: Query<(&mut OrthographicProjection, &ActionState<CameraMovement>), With<Camera2d>>
 ) {
     const CAMERA_ZOOM_RATE: f32 = 0.05;
 
@@ -54,11 +52,11 @@ fn zoom_camera(
     // We want to zoom in when we use mouse wheel up,
     // so we increase the scale proportionally
     // Note that the projection's scale should always be positive (or our images will flip)
-    camera_projection.scale *= 1. - zoom_delta * CAMERA_ZOOM_RATE;
+    camera_projection.scale *= 1.0 - zoom_delta * CAMERA_ZOOM_RATE;
 }
 
 fn pan_camera(mut query: Query<(&mut Transform, &ActionState<CameraMovement>), With<Camera2d>>) {
-    const CAMERA_PAN_RATE: f32 = 10.;
+    const CAMERA_PAN_RATE: f32 = 10.0;
 
     let (mut camera_transform, action_state) = query.single_mut();
 

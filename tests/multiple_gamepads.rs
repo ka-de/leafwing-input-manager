@@ -1,7 +1,7 @@
-use bevy::input::gamepad::{GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo};
+use bevy::input::gamepad::{ GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo };
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum MyAction {
@@ -14,20 +14,24 @@ fn create_test_app() -> App {
     app.add_plugins(InputManagerPlugin::<MyAction>::default());
 
     let mut gamepad_events = app.world.resource_mut::<Events<GamepadEvent>>();
-    gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-        // Must be consistent with mocked events
-        gamepad: Gamepad { id: 1 },
-        connection: GamepadConnection::Connected(GamepadInfo {
-            name: "FirstController".into(),
-        }),
-    }));
-    gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-        // Must be consistent with mocked events
-        gamepad: Gamepad { id: 2 },
-        connection: GamepadConnection::Connected(GamepadInfo {
-            name: "SecondController".into(),
-        }),
-    }));
+    gamepad_events.send(
+        GamepadEvent::Connection(GamepadConnectionEvent {
+            // Must be consistent with mocked events
+            gamepad: Gamepad { id: 1 },
+            connection: GamepadConnection::Connected(GamepadInfo {
+                name: "FirstController".into(),
+            }),
+        })
+    );
+    gamepad_events.send(
+        GamepadEvent::Connection(GamepadConnectionEvent {
+            // Must be consistent with mocked events
+            gamepad: Gamepad { id: 2 },
+            connection: GamepadConnection::Connected(GamepadInfo {
+                name: "SecondController".into(),
+            }),
+        })
+    );
 
     // Ensure the gamepads are picked up
     app.update();
@@ -40,11 +44,7 @@ fn create_test_app() -> App {
 fn jump_button_press_event(gamepad: Gamepad) -> GamepadEvent {
     use bevy::input::gamepad::GamepadButtonChangedEvent;
 
-    GamepadEvent::Button(GamepadButtonChangedEvent::new(
-        gamepad,
-        GamepadButtonType::South,
-        1.0,
-    ))
+    GamepadEvent::Button(GamepadButtonChangedEvent::new(gamepad, GamepadButtonType::South, 1.0))
 }
 
 #[test]

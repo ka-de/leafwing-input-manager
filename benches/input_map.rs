@@ -1,14 +1,11 @@
 use bevy::prelude::Reflect;
 use bevy::utils::HashMap;
-use bevy::{
-    input::InputPlugin,
-    prelude::{App, KeyCode},
-};
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use leafwing_input_manager::{
+use bevy::{ input::InputPlugin, prelude::{ App, KeyCode } };
+use criterion::{ black_box, criterion_group, criterion_main, Criterion };
+use input_manager::{
     action_state::ActionData,
     input_streams::InputStreams,
-    prelude::{ClashStrategy, InputMap, MockInput},
+    prelude::{ ClashStrategy, InputMap, MockInput },
     Actionlike,
 };
 
@@ -27,18 +24,20 @@ enum TestAction {
 }
 
 fn construct_input_map_from_iter() -> InputMap<TestAction> {
-    black_box(InputMap::new([
-        (TestAction::A, KeyCode::KeyA),
-        (TestAction::B, KeyCode::KeyB),
-        (TestAction::C, KeyCode::KeyC),
-        (TestAction::D, KeyCode::KeyD),
-        (TestAction::E, KeyCode::KeyE),
-        (TestAction::F, KeyCode::KeyF),
-        (TestAction::G, KeyCode::KeyG),
-        (TestAction::H, KeyCode::KeyH),
-        (TestAction::I, KeyCode::KeyI),
-        (TestAction::J, KeyCode::KeyJ),
-    ]))
+    black_box(
+        InputMap::new([
+            (TestAction::A, KeyCode::KeyA),
+            (TestAction::B, KeyCode::KeyB),
+            (TestAction::C, KeyCode::KeyC),
+            (TestAction::D, KeyCode::KeyD),
+            (TestAction::E, KeyCode::KeyE),
+            (TestAction::F, KeyCode::KeyF),
+            (TestAction::G, KeyCode::KeyG),
+            (TestAction::H, KeyCode::KeyH),
+            (TestAction::I, KeyCode::KeyI),
+            (TestAction::J, KeyCode::KeyJ),
+        ])
+    )
 }
 
 fn construct_input_map_from_chained_calls() -> InputMap<TestAction> {
@@ -53,13 +52,13 @@ fn construct_input_map_from_chained_calls() -> InputMap<TestAction> {
             .with(TestAction::G, KeyCode::KeyG)
             .with(TestAction::H, KeyCode::KeyH)
             .with(TestAction::I, KeyCode::KeyI)
-            .with(TestAction::J, KeyCode::KeyJ),
+            .with(TestAction::J, KeyCode::KeyJ)
     )
 }
 
 fn which_pressed(
     input_streams: &InputStreams,
-    clash_strategy: ClashStrategy,
+    clash_strategy: ClashStrategy
 ) -> HashMap<TestAction, ActionData> {
     let input_map = construct_input_map_from_iter();
     input_map.process_actions(input_streams, clash_strategy)

@@ -1,10 +1,14 @@
 use bevy::input::gamepad::{
-    GamepadAxisChangedEvent, GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo,
+    GamepadAxisChangedEvent,
+    GamepadConnection,
+    GamepadConnectionEvent,
+    GamepadEvent,
+    GamepadInfo,
 };
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::axislike::DualAxisData;
-use leafwing_input_manager::prelude::*;
+use input_manager::axislike::DualAxisData;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum ButtonlikeTestAction {
@@ -32,13 +36,15 @@ fn test_app() -> App {
 
     // WARNING: you MUST register your gamepad during tests, or all gamepad input mocking will fail
     let mut gamepad_events = app.world.resource_mut::<Events<GamepadEvent>>();
-    gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-        // This MUST be consistent with any other mocked events
-        gamepad: Gamepad { id: 1 },
-        connection: GamepadConnection::Connected(GamepadInfo {
-            name: "TestController".into(),
-        }),
-    }));
+    gamepad_events.send(
+        GamepadEvent::Connection(GamepadConnectionEvent {
+            // This MUST be consistent with any other mocked events
+            gamepad: Gamepad { id: 1 },
+            connection: GamepadConnection::Connected(GamepadInfo {
+                name: "TestController".into(),
+            }),
+        })
+    );
 
     // Ensure that the gamepad is picked up by the appropriate system
     app.update();
@@ -51,17 +57,23 @@ fn test_app() -> App {
 #[test]
 fn raw_gamepad_axis_events() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        ButtonlikeTestAction::Up,
-        SingleAxis::new(GamepadAxisType::RightStickX).with_deadzone_symmetric(0.1),
-    )]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                ButtonlikeTestAction::Up,
+                SingleAxis::new(GamepadAxisType::RightStickX).with_deadzone_symmetric(0.1),
+            ),
+        ])
+    );
 
     let mut events = app.world.resource_mut::<Events<GamepadEvent>>();
-    events.send(GamepadEvent::Axis(GamepadAxisChangedEvent {
-        gamepad: Gamepad { id: 1 },
-        axis_type: GamepadAxisType::RightStickX,
-        value: 1.0,
-    }));
+    events.send(
+        GamepadEvent::Axis(GamepadAxisChangedEvent {
+            gamepad: Gamepad { id: 1 },
+            axis_type: GamepadAxisType::RightStickX,
+            value: 1.0,
+        })
+    );
 
     app.update();
     let action_state = app.world.resource::<ActionState<ButtonlikeTestAction>>();
@@ -100,16 +112,18 @@ fn game_pad_dual_axis_mocking() {
 #[test]
 fn game_pad_single_axis() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (
-            AxislikeTestAction::X,
-            SingleAxis::new(GamepadAxisType::LeftStickX).with_deadzone_symmetric(0.1),
-        ),
-        (
-            AxislikeTestAction::Y,
-            SingleAxis::new(GamepadAxisType::LeftStickY).with_deadzone_symmetric(0.1),
-        ),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::X,
+                SingleAxis::new(GamepadAxisType::LeftStickX).with_deadzone_symmetric(0.1),
+            ),
+            (
+                AxislikeTestAction::Y,
+                SingleAxis::new(GamepadAxisType::LeftStickY).with_deadzone_symmetric(0.1),
+            ),
+        ])
+    );
 
     // +X
     let input = SingleAxis::new(GamepadAxisType::LeftStickX);
@@ -166,20 +180,22 @@ fn game_pad_single_axis() {
 #[test]
 fn game_pad_single_axis_inverted() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (
-            AxislikeTestAction::X,
-            SingleAxis::new(GamepadAxisType::LeftStickX)
-                .with_deadzone_symmetric(0.1)
-                .inverted(),
-        ),
-        (
-            AxislikeTestAction::Y,
-            SingleAxis::new(GamepadAxisType::LeftStickY)
-                .with_deadzone_symmetric(0.1)
-                .inverted(),
-        ),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::X,
+                SingleAxis::new(GamepadAxisType::LeftStickX)
+                    .with_deadzone_symmetric(0.1)
+                    .inverted(),
+            ),
+            (
+                AxislikeTestAction::Y,
+                SingleAxis::new(GamepadAxisType::LeftStickY)
+                    .with_deadzone_symmetric(0.1)
+                    .inverted(),
+            ),
+        ])
+    );
 
     // +X
     let input = SingleAxis::new(GamepadAxisType::LeftStickX);
@@ -217,11 +233,16 @@ fn game_pad_single_axis_inverted() {
 #[test]
 fn game_pad_dual_axis_deadzone() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        DualAxis::left_stick()
-            .replace_processing_pipeline([DualAxisDeadZone::symmetric_all(0.1).into()]),
-    )]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::XY,
+                DualAxis::left_stick().replace_processing_pipeline([
+                    DualAxisDeadZone::symmetric_all(0.1).into(),
+                ]),
+            ),
+        ])
+    );
 
     // Test that an input inside the dual-axis deadzone is filtered out.
     let input = DualAxis::left_stick();
@@ -266,10 +287,16 @@ fn game_pad_dual_axis_deadzone() {
 #[test]
 fn game_pad_circle_deadzone() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        DualAxis::left_stick().replace_processing_pipeline([CircleDeadZone::new(0.1).into()]),
-    )]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::XY,
+                DualAxis::left_stick().replace_processing_pipeline([
+                    CircleDeadZone::new(0.1).into(),
+                ]),
+            ),
+        ])
+    );
 
     // Test that an input inside the circle deadzone is filtered out, assuming values of 0.1
     let input = DualAxis::left_stick();
@@ -301,11 +328,16 @@ fn game_pad_circle_deadzone() {
 #[test]
 fn test_zero_dual_axis_deadzone() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        DualAxis::left_stick()
-            .replace_processing_pipeline([DualAxisDeadZone::symmetric_all(0.0).into()]),
-    )]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::XY,
+                DualAxis::left_stick().replace_processing_pipeline([
+                    DualAxisDeadZone::symmetric_all(0.0).into(),
+                ]),
+            ),
+        ])
+    );
 
     // Test that an input of zero will be `None` even with no deadzone.
     let input = DualAxis::left_stick();
@@ -324,10 +356,16 @@ fn test_zero_dual_axis_deadzone() {
 #[test]
 fn test_zero_circle_deadzone() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        DualAxis::left_stick().replace_processing_pipeline([CircleDeadZone::new(0.0).into()]),
-    )]));
+    app.insert_resource(
+        InputMap::new([
+            (
+                AxislikeTestAction::XY,
+                DualAxis::left_stick().replace_processing_pipeline([
+                    CircleDeadZone::new(0.0).into(),
+                ]),
+            ),
+        ])
+    );
 
     // Test that an input of zero will be `None` even with no deadzone.
     let input = DualAxis::left_stick();
@@ -347,10 +385,7 @@ fn test_zero_circle_deadzone() {
 #[ignore = "Input mocking is subtly broken: https://github.com/Leafwing-Studios/leafwing-input-manager/issues/407"]
 fn game_pad_virtual_dpad() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        VirtualDPad::dpad(),
-    )]));
+    app.insert_resource(InputMap::new([(AxislikeTestAction::XY, VirtualDPad::dpad())]));
 
     app.press_input(GamepadButtonType::DPadLeft);
     app.update();
