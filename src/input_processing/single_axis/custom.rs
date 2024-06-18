@@ -1,22 +1,32 @@
-use std::any::{Any, TypeId};
-use std::fmt::{Debug, Formatter};
-use std::hash::{Hash, Hasher};
+use std::any::{ Any, TypeId };
+use std::fmt::{ Debug, Formatter };
+use std::hash::{ Hash, Hasher };
 use std::sync::RwLock;
 
 use bevy::app::App;
-use bevy::prelude::{FromReflect, Reflect, ReflectDeserialize, ReflectSerialize, TypePath};
-use bevy::reflect::utility::{reflect_hasher, GenericTypePathCell, NonGenericTypeInfoCell};
+use bevy::prelude::{ FromReflect, Reflect, ReflectDeserialize, ReflectSerialize, TypePath };
+use bevy::reflect::utility::{ reflect_hasher, GenericTypePathCell, NonGenericTypeInfoCell };
 use bevy::reflect::{
-    erased_serde, FromType, GetTypeRegistration, ReflectFromPtr, ReflectKind, ReflectMut,
-    ReflectOwned, ReflectRef, TypeInfo, TypeRegistration, Typed, ValueInfo,
+    erased_serde,
+    FromType,
+    GetTypeRegistration,
+    ReflectFromPtr,
+    ReflectKind,
+    ReflectMut,
+    ReflectOwned,
+    ReflectRef,
+    TypeInfo,
+    TypeRegistration,
+    Typed,
+    ValueInfo,
 };
 use dyn_clone::DynClone;
 use dyn_eq::DynEq;
 use dyn_hash::DynHash;
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{ Deserialize, Deserializer, Serialize, Serializer };
 use serde_flexitos::ser::require_erased_serialize_impl;
-use serde_flexitos::{serialize_trait_object, MapRegistry, Registry};
+use serde_flexitos::{ serialize_trait_object, MapRegistry, Registry };
 
 use crate::input_processing::AxisProcessor;
 use crate::typetag::RegisterTypeTag;
@@ -31,7 +41,7 @@ use crate::typetag::RegisterTypeTag;
 /// use bevy::prelude::*;
 /// use bevy::math::FloatOrd;
 /// use serde::{Deserialize, Serialize};
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// /// Doubles the input, takes the absolute value,
 /// /// and discards results that meet the specified condition.
@@ -90,8 +100,14 @@ use crate::typetag::RegisterTypeTag;
 /// let axis_processor = AxisProcessor::Custom(Box::new(processor));
 /// assert_eq!(axis_processor, AxisProcessor::from(processor));
 /// ```
-pub trait CustomAxisProcessor:
-    Send + Sync + Debug + DynClone + DynEq + DynHash + Reflect + erased_serde::Serialize
+pub trait CustomAxisProcessor: Send +
+    Sync +
+    Debug +
+    DynClone +
+    DynEq +
+    DynHash +
+    Reflect +
+    erased_serde::Serialize
 {
     /// Computes the result by processing the `input_value`.
     fn process(&self, input_value: f32) -> f32;
@@ -197,11 +213,7 @@ impl Reflect for Box<dyn CustomAxisProcessor> {
                     .unwrap_or_default()
                     .to_string()
                     .into_boxed_str(),
-                to_type: self
-                    .reflect_type_ident()
-                    .unwrap_or_default()
-                    .to_string()
-                    .into_boxed_str(),
+                to_type: self.reflect_type_ident().unwrap_or_default().to_string().into_boxed_str(),
             })
         }
     }
@@ -218,12 +230,7 @@ impl TypePath for Box<dyn CustomAxisProcessor> {
     fn type_path() -> &'static str {
         static CELL: GenericTypePathCell = GenericTypePathCell::new();
         CELL.get_or_insert::<Self, _>(|| {
-            {
-                format!(
-                    "std::boxed::Box<dyn {}::CustomAxisProcessor>",
-                    module_path!()
-                )
-            }
+            { format!("std::boxed::Box<dyn {}::CustomAxisProcessor>", module_path!()) }
         })
     }
 
@@ -262,10 +269,7 @@ impl FromReflect for Box<dyn CustomAxisProcessor> {
 }
 
 impl<'a> Serialize for dyn CustomAxisProcessor + 'a {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         // Check that `CustomAxisProcessor` has `erased_serde::Serialize` as a super trait,
         // preventing infinite recursion at runtime.
         const fn __check_erased_serialize_super_trait<T: ?Sized + CustomAxisProcessor>() {
@@ -276,31 +280,27 @@ impl<'a> Serialize for dyn CustomAxisProcessor + 'a {
 }
 
 impl<'de> Deserialize<'de> for Box<dyn CustomAxisProcessor> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
         let registry = unsafe { PROCESSOR_REGISTRY.read().unwrap() };
         registry.deserialize_trait_object(deserializer)
     }
 }
 
 /// Registry of deserializers for [`CustomAxisProcessor`]s.
-static mut PROCESSOR_REGISTRY: Lazy<RwLock<MapRegistry<dyn CustomAxisProcessor>>> =
-    Lazy::new(|| RwLock::new(MapRegistry::new("CustomAxisProcessor")));
+static mut PROCESSOR_REGISTRY: Lazy<RwLock<MapRegistry<dyn CustomAxisProcessor>>> = Lazy::new(||
+    RwLock::new(MapRegistry::new("CustomAxisProcessor"))
+);
 
 /// A trait for registering a specific [`CustomAxisProcessor`].
 pub trait RegisterCustomAxisProcessorExt {
     /// Registers the specified [`CustomAxisProcessor`].
     fn register_axis_processor<'de, T>(&mut self) -> &mut Self
-    where
-        T: RegisterTypeTag<'de, dyn CustomAxisProcessor> + GetTypeRegistration;
+        where T: RegisterTypeTag<'de, dyn CustomAxisProcessor> + GetTypeRegistration;
 }
 
 impl RegisterCustomAxisProcessorExt for App {
     fn register_axis_processor<'de, T>(&mut self) -> &mut Self
-    where
-        T: RegisterTypeTag<'de, dyn CustomAxisProcessor> + GetTypeRegistration,
+        where T: RegisterTypeTag<'de, dyn CustomAxisProcessor> + GetTypeRegistration
     {
         let mut registry = unsafe { PROCESSOR_REGISTRY.write().unwrap() };
         T::register_typetag(&mut registry);
@@ -312,9 +312,9 @@ impl RegisterCustomAxisProcessorExt for App {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate as leafwing_input_manager;
-    use leafwing_input_manager_macros::serde_typetag;
-    use serde_test::{assert_tokens, Token};
+    use crate as input_manager;
+    use input_manager_macros::serde_typetag;
+    use serde_test::{ assert_tokens, Token };
 
     #[test]
     fn test_custom_axis_processor() {
@@ -341,14 +341,14 @@ mod tests {
                     name: "CustomAxisInverted",
                 },
                 Token::MapEnd,
-            ],
+            ]
         );
 
         let processor = AxisProcessor::Custom(custom);
         assert_eq!(AxisProcessor::from(CustomAxisInverted), processor);
 
         for value in -300..300 {
-            let value = value as f32 * 0.01;
+            let value = (value as f32) * 0.01;
 
             assert_eq!(processor.process(value), -value);
             assert_eq!(CustomAxisInverted.process(value), -value);

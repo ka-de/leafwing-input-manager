@@ -1,8 +1,8 @@
-use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
+use bevy::input::mouse::{ MouseScrollUnit, MouseWheel };
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::axislike::DualAxisData;
-use leafwing_input_manager::prelude::*;
+use input_manager::axislike::DualAxisData;
+use input_manager::prelude::*;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
 enum ButtonlikeTestAction {
@@ -40,10 +40,7 @@ fn test_app() -> App {
 #[test]
 fn raw_mouse_scroll_events() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        ButtonlikeTestAction::Up,
-        MouseScrollDirection::UP,
-    )]));
+    app.insert_resource(InputMap::new([(ButtonlikeTestAction::Up, MouseScrollDirection::UP)]));
 
     let mut events = app.world_mut().resource_mut::<Events<MouseWheel>>();
     events.send(MouseWheel {
@@ -100,12 +97,14 @@ fn mouse_scroll_dual_axis_mocking() {
 #[test]
 fn mouse_scroll_buttonlike() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (ButtonlikeTestAction::Up, MouseScrollDirection::UP),
-        (ButtonlikeTestAction::Down, MouseScrollDirection::DOWN),
-        (ButtonlikeTestAction::Left, MouseScrollDirection::LEFT),
-        (ButtonlikeTestAction::Right, MouseScrollDirection::RIGHT),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (ButtonlikeTestAction::Up, MouseScrollDirection::UP),
+            (ButtonlikeTestAction::Down, MouseScrollDirection::DOWN),
+            (ButtonlikeTestAction::Left, MouseScrollDirection::LEFT),
+            (ButtonlikeTestAction::Right, MouseScrollDirection::RIGHT),
+        ])
+    );
 
     for action in ButtonlikeTestAction::variants() {
         let input_map = app.world().resource::<InputMap<ButtonlikeTestAction>>();
@@ -126,12 +125,14 @@ fn mouse_scroll_buttonlike() {
 #[test]
 fn mouse_scroll_buttonlike_cancels() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (ButtonlikeTestAction::Up, MouseScrollDirection::UP),
-        (ButtonlikeTestAction::Down, MouseScrollDirection::DOWN),
-        (ButtonlikeTestAction::Left, MouseScrollDirection::LEFT),
-        (ButtonlikeTestAction::Right, MouseScrollDirection::RIGHT),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (ButtonlikeTestAction::Up, MouseScrollDirection::UP),
+            (ButtonlikeTestAction::Down, MouseScrollDirection::DOWN),
+            (ButtonlikeTestAction::Left, MouseScrollDirection::LEFT),
+            (ButtonlikeTestAction::Right, MouseScrollDirection::RIGHT),
+        ])
+    );
 
     app.press_input(MouseScrollDirection::UP);
     app.press_input(MouseScrollDirection::DOWN);
@@ -148,10 +149,12 @@ fn mouse_scroll_buttonlike_cancels() {
 #[test]
 fn mouse_scroll_single_axis() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([
-        (AxislikeTestAction::X, MouseScrollAxis::X),
-        (AxislikeTestAction::Y, MouseScrollAxis::Y),
-    ]));
+    app.insert_resource(
+        InputMap::new([
+            (AxislikeTestAction::X, MouseScrollAxis::X),
+            (AxislikeTestAction::Y, MouseScrollAxis::Y),
+        ])
+    );
 
     // +X
     let input = MouseScrollAxis::X;
@@ -199,10 +202,7 @@ fn mouse_scroll_single_axis() {
 #[test]
 fn mouse_scroll_dual_axis() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        MouseScroll::default(),
-    )]));
+    app.insert_resource(InputMap::new([(AxislikeTestAction::XY, MouseScroll::default())]));
 
     let input = MouseScroll::default();
     app.send_axis_values(input, [5.0, 0.0]);
@@ -221,10 +221,9 @@ fn mouse_scroll_dual_axis() {
 #[test]
 fn mouse_scroll_discrete() {
     let mut app = test_app();
-    app.insert_resource(InputMap::new([(
-        AxislikeTestAction::XY,
-        MouseScroll::default().digital(),
-    )]));
+    app.insert_resource(
+        InputMap::new([(AxislikeTestAction::XY, MouseScroll::default().digital())])
+    );
 
     let input = MouseScroll::default();
     app.send_axis_values(input, [0.0, -2.0]);

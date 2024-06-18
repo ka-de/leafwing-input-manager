@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -153,7 +153,7 @@ pub struct PlayerWalk {
 
 fn player_walks(
     query: Query<&ActionState<ArpgAction>, With<Player>>,
-    mut event_writer: EventWriter<PlayerWalk>,
+    mut event_writer: EventWriter<PlayerWalk>
 ) {
     let action_state = query.single();
 

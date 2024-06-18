@@ -1,19 +1,21 @@
 //! Keyboard inputs
 
-use bevy::prelude::{KeyCode, Reflect, Vec2};
-use leafwing_input_manager_macros::serde_typetag;
-use serde::{Deserialize, Serialize};
+use bevy::prelude::{ KeyCode, Reflect, Vec2 };
+use input_manager_macros::serde_typetag;
+use serde::{ Deserialize, Serialize };
 
-use crate as leafwing_input_manager;
+use crate as input_manager;
 use crate::axislike::DualAxisData;
 use crate::clashing_inputs::BasicInputs;
 use crate::input_processing::{
-    AxisProcessor, DualAxisProcessor, WithAxisProcessingPipelineExt,
+    AxisProcessor,
+    DualAxisProcessor,
+    WithAxisProcessingPipelineExt,
     WithDualAxisProcessingPipelineExt,
 };
 use crate::input_streams::InputStreams;
 use crate::raw_inputs::RawInputs;
-use crate::user_input::{InputChord, InputControlKind, UserInput};
+use crate::user_input::{ InputChord, InputControlKind, UserInput };
 
 // Built-in support for Bevy's KeyCode
 #[serde_typetag]
@@ -28,9 +30,7 @@ impl UserInput for KeyCode {
     #[must_use]
     #[inline]
     fn pressed(&self, input_streams: &InputStreams) -> bool {
-        input_streams
-            .keycodes
-            .is_some_and(|keys| keys.pressed(*self))
+        input_streams.keycodes.is_some_and(|keys| keys.pressed(*self))
     }
 
     /// Retrieves the strength of the key press for the specified key,
@@ -140,9 +140,7 @@ impl UserInput for ModifierKey {
     #[must_use]
     #[inline]
     fn pressed(&self, input_streams: &InputStreams) -> bool {
-        input_streams
-            .keycodes
-            .is_some_and(|keycodes| keycodes.any_pressed(self.keycodes()))
+        input_streams.keycodes.is_some_and(|keycodes| keycodes.any_pressed(self.keycodes()))
     }
 
     /// Gets the strength of the key press for the specified modifier key,
@@ -190,7 +188,7 @@ impl UserInput for ModifierKey {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -319,9 +317,7 @@ impl UserInput for KeyboardVirtualAxis {
         let negative = f32::from(keycodes.pressed(self.negative));
         let positive = f32::from(keycodes.pressed(self.positive));
         let value = positive - negative;
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 
     /// Always returns [`None`] as [`KeyboardVirtualAxis`] doesn't represent dual-axis input.
@@ -354,7 +350,7 @@ impl WithAxisProcessingPipelineExt for KeyboardVirtualAxis {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -385,7 +381,7 @@ impl WithAxisProcessingPipelineExt for KeyboardVirtualAxis {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -490,9 +486,7 @@ impl KeyboardVirtualDPad {
         let left = f32::from(keycodes.pressed(self.left));
         let right = f32::from(keycodes.pressed(self.right));
         let value = Vec2::new(right - left, up - down);
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 }
 
@@ -529,12 +523,9 @@ impl UserInput for KeyboardVirtualDPad {
     /// [`KeyboardVirtualDPad`] represents a compositions of four [`KeyCode`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(self.up),
-            Box::new(self.down),
-            Box::new(self.left),
-            Box::new(self.right),
-        ])
+        BasicInputs::Composite(
+            vec![Box::new(self.up), Box::new(self.down), Box::new(self.left), Box::new(self.right)]
+        )
     }
 
     /// Creates a [`RawInputs`] from four [`KeyCode`]s used by this D-pad.
@@ -554,7 +545,7 @@ impl WithDualAxisProcessingPipelineExt for KeyboardVirtualDPad {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = DualAxisProcessor>,
+        processors: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -586,7 +577,7 @@ mod tests {
         input_streams: &InputStreams,
         expected_pressed: bool,
         expected_value: f32,
-        expected_axis_pair: Option<DualAxisData>,
+        expected_axis_pair: Option<DualAxisData>
     ) {
         assert_eq!(input.pressed(input_streams), expected_pressed);
         assert_eq!(input.value(input_streams), expected_value);

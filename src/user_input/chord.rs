@@ -1,14 +1,14 @@
 //! This module contains [`InputChord`] and its impls.
 
 use bevy::prelude::Reflect;
-use leafwing_input_manager_macros::serde_typetag;
-use serde::{Deserialize, Serialize};
+use input_manager_macros::serde_typetag;
+use serde::{ Deserialize, Serialize };
 
-use crate as leafwing_input_manager;
+use crate as input_manager;
 use crate::clashing_inputs::BasicInputs;
 use crate::input_streams::InputStreams;
 use crate::raw_inputs::RawInputs;
-use crate::user_input::{DualAxisData, InputControlKind, UserInput};
+use crate::user_input::{ DualAxisData, InputControlKind, UserInput };
 
 /// A combined input that groups multiple [`UserInput`]s together,
 /// allowing you to define complex input combinations like hotkeys, shortcuts, and macros.
@@ -37,7 +37,7 @@ use crate::user_input::{DualAxisData, InputControlKind, UserInput};
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -200,8 +200,7 @@ impl UserInput for InputChord {
     /// Retrieves a list of simple, atomic [`UserInput`]s that compose the chord.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        let inputs = self
-            .0
+        let inputs = self.0
             .iter()
             .flat_map(|input| input.decompose().inputs())
             .collect();
@@ -211,9 +210,9 @@ impl UserInput for InputChord {
     /// Returns the [`RawInputs`] that combines the raw input events of all inner inputs.
     #[inline]
     fn raw_inputs(&self) -> RawInputs {
-        self.0.iter().fold(RawInputs::default(), |inputs, next| {
-            inputs.merge_input(&next.raw_inputs())
-        })
+        self.0
+            .iter()
+            .fold(RawInputs::default(), |inputs, next| { inputs.merge_input(&next.raw_inputs()) })
     }
 }
 
@@ -233,7 +232,10 @@ impl<U: UserInput> FromIterator<U> for InputChord {
 #[cfg(test)]
 mod tests {
     use bevy::input::gamepad::{
-        GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo,
+        GamepadConnection,
+        GamepadConnectionEvent,
+        GamepadEvent,
+        GamepadInfo,
     };
     use bevy::input::InputPlugin;
     use bevy::prelude::*;
@@ -248,13 +250,15 @@ mod tests {
         // WARNING: you MUST register your gamepad during tests,
         // or all gamepad input mocking actions will fail
         let mut gamepad_events = app.world_mut().resource_mut::<Events<GamepadEvent>>();
-        gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-            // This MUST be consistent with any other mocked events
-            gamepad: Gamepad { id: 1 },
-            connection: GamepadConnection::Connected(GamepadInfo {
-                name: "TestController".into(),
-            }),
-        }));
+        gamepad_events.send(
+            GamepadEvent::Connection(GamepadConnectionEvent {
+                // This MUST be consistent with any other mocked events
+                gamepad: Gamepad { id: 1 },
+                connection: GamepadConnection::Connected(GamepadInfo {
+                    name: "TestController".into(),
+                }),
+            })
+        );
 
         // Ensure that the gamepad is picked up by the appropriate system
         app.update();
@@ -268,7 +272,7 @@ mod tests {
         input_streams: &InputStreams,
         expected_pressed: bool,
         expected_value: f32,
-        expected_axis_pair: Option<DualAxisData>,
+        expected_axis_pair: Option<DualAxisData>
     ) {
         assert_eq!(input.pressed(input_streams), expected_pressed);
         assert_eq!(input.value(input_streams), expected_value);

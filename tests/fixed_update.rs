@@ -2,11 +2,11 @@ use bevy::input::InputPlugin;
 use bevy::prelude::*;
 use bevy::time::TimeUpdateStrategy;
 use bevy::MinimalPlugins;
-use leafwing_input_manager::action_state::ActionState;
-use leafwing_input_manager::input_map::InputMap;
-use leafwing_input_manager::input_mocking::MockInput;
-use leafwing_input_manager::plugin::{InputManagerPlugin, InputManagerSystem};
-use leafwing_input_manager_macros::Actionlike;
+use input_manager::action_state::ActionState;
+use input_manager::input_map::InputMap;
+use input_manager::input_mocking::MockInput;
+use input_manager::plugin::{ InputManagerPlugin, InputManagerSystem };
+use input_manager_macros::Actionlike;
 use std::time::Duration;
 
 #[derive(Actionlike, Clone, Copy, Debug, Reflect, PartialEq, Eq, Hash)]
@@ -35,10 +35,7 @@ fn build_app(fixed_timestep: Duration, frame_timestep: Duration) -> App {
         .init_resource::<UpdateCounter>()
         .init_resource::<FixedUpdateCounter>()
         .init_resource::<ActionState<TestAction>>()
-        .insert_resource(InputMap::<TestAction>::new([(
-            TestAction::Up,
-            KeyCode::ArrowUp,
-        )]))
+        .insert_resource(InputMap::<TestAction>::new([(TestAction::Up, KeyCode::ArrowUp)]))
         .insert_resource(Time::<Fixed>::from_duration(fixed_timestep))
         .insert_resource(TimeUpdateStrategy::ManualDuration(frame_timestep));
 
@@ -47,9 +44,7 @@ fn build_app(fixed_timestep: Duration, frame_timestep: Duration) -> App {
 
     // we have to set an initial time for TimeUpdateStrategy::ManualDuration to work properly
     let startup = app.world().resource::<Time<Real>>().startup();
-    app.world_mut()
-        .resource_mut::<Time<Real>>()
-        .update_with_instant(startup);
+    app.world_mut().resource_mut::<Time<Real>>().update_with_instant(startup);
     app
 }
 
@@ -58,7 +53,7 @@ fn build_app(fixed_timestep: Duration, frame_timestep: Duration) -> App {
 /// - was the button marked as `just_pressed` in the FixedUpdate schedule?
 fn fixed_update_counter(
     mut counter: ResMut<FixedUpdateCounter>,
-    action: Res<ActionState<TestAction>>,
+    action: Res<ActionState<TestAction>>
 ) {
     if action.just_pressed(&TestAction::Up) {
         counter.just_pressed += 1;
@@ -86,10 +81,7 @@ fn reset_counters(app: &mut App) {
 /// Assert that the FixedUpdate schedule run the expected number of times
 fn check_fixed_update_run_count(app: &mut App, expected: usize) {
     assert_eq!(
-        app.world()
-            .get_resource::<FixedUpdateCounter>()
-            .unwrap()
-            .run,
+        app.world().get_resource::<FixedUpdateCounter>().unwrap().run,
         expected,
         "FixedUpdate schedule should have run {} times",
         expected
@@ -99,10 +91,7 @@ fn check_fixed_update_run_count(app: &mut App, expected: usize) {
 /// Assert that the button was just_pressed the expected number of times during the FixedUpdate schedule
 fn check_fixed_update_just_pressed_count(app: &mut App, expected: usize) {
     assert_eq!(
-        app.world()
-            .get_resource::<FixedUpdateCounter>()
-            .unwrap()
-            .just_pressed,
+        app.world().get_resource::<FixedUpdateCounter>().unwrap().just_pressed,
         expected,
         "Button should have been just_pressed {} times during the FixedUpdate schedule",
         expected
@@ -112,10 +101,7 @@ fn check_fixed_update_just_pressed_count(app: &mut App, expected: usize) {
 /// Assert that the button was just_pressed the expected number of times during the Update schedule
 fn check_update_just_pressed_count(app: &mut App, expected: usize) {
     assert_eq!(
-        app.world()
-            .get_resource::<UpdateCounter>()
-            .unwrap()
-            .just_pressed,
+        app.world().get_resource::<UpdateCounter>().unwrap().just_pressed,
         expected,
         "Button should have been just_pressed {} times during the Update schedule",
         expected
@@ -158,7 +144,8 @@ fn frame_without_fixed_timestep() {
     // which is only updated in `PreUpdate`, which is what we want)
     #[cfg(feature = "timing")]
     assert_eq!(
-        app.world()
+        app
+            .world()
             .get_resource::<ActionState<TestAction>>()
             .unwrap()
             .current_duration(&TestAction::Up),
@@ -196,7 +183,8 @@ fn frame_with_two_fixed_timestep() {
     // which is only updated in `PreUpdate`, which is what we want)
     #[cfg(feature = "timing")]
     assert_eq!(
-        app.world()
+        app
+            .world()
             .get_resource::<ActionState<TestAction>>()
             .unwrap()
             .current_duration(&TestAction::Up),
@@ -210,12 +198,9 @@ fn frame_with_two_fixed_timestep() {
 fn test_consume_in_fixed_update() {
     let mut app = build_app(Duration::from_millis(5), Duration::from_millis(5));
 
-    app.add_systems(
-        FixedPostUpdate,
-        |mut action: ResMut<ActionState<TestAction>>| {
-            action.consume(&TestAction::Up);
-        },
-    );
+    app.add_systems(FixedPostUpdate, |mut action: ResMut<ActionState<TestAction>>| {
+        action.consume(&TestAction::Up);
+    });
 
     app.press_input(KeyCode::ArrowUp);
 
@@ -228,12 +213,12 @@ fn test_consume_in_fixed_update() {
 
     // the button should still be consumed, even after we exit the FixedUpdate schedule
     assert!(
-        app.world()
+        app
+            .world()
             .get_resource::<ActionState<TestAction>>()
             .unwrap()
             .action_data(&TestAction::Up)
-            .unwrap()
-            .consumed,
+            .unwrap().consumed
     );
 }
 
@@ -248,17 +233,11 @@ fn test_consume_in_update() {
         action.consume(&TestAction::Up);
     }
 
-    app.add_systems(
-        PreUpdate,
-        consume_action.in_set(InputManagerSystem::ManualControl),
-    );
+    app.add_systems(PreUpdate, consume_action.in_set(InputManagerSystem::ManualControl));
 
     app.add_systems(FixedUpdate, |action: Res<ActionState<TestAction>>| {
         // check that the action is still consumed in the FixedMain schedule
-        assert!(
-            action.consumed(&TestAction::Up),
-            "Action should still be consumed in FixedUpdate"
-        );
+        assert!(action.consumed(&TestAction::Up), "Action should still be consumed in FixedUpdate");
     });
 
     // the FixedUpdate schedule should run once

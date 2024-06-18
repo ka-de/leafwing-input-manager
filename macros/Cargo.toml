@@ -1,5 +1,5 @@
 [package]
-name = "leafwing_input_manager_macros"
+name = "input_manager_macros"
 description = "Macros for the `leafwing-input-manager` crate"
 version = "0.13.1"
 

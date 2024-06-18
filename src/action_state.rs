@@ -4,15 +4,15 @@ use crate::action_diff::ActionDiff;
 #[cfg(feature = "timing")]
 use crate::timing::Timing;
 use crate::Actionlike;
-use crate::{axislike::DualAxisData, buttonlike::ButtonState};
+use crate::{ axislike::DualAxisData, buttonlike::ButtonState };
 
 use bevy::ecs::component::Component;
 use bevy::prelude::Resource;
 use bevy::reflect::Reflect;
 #[cfg(feature = "timing")]
 use bevy::utils::Duration;
-use bevy::utils::{HashMap, Instant};
-use serde::{Deserialize, Serialize};
+use bevy::utils::{ HashMap, Instant };
+use serde::{ Deserialize, Serialize };
 
 /// Metadata about an [`Actionlike`] action
 ///
@@ -85,7 +85,7 @@ impl ActionData {
 /// # Example
 /// ```rust
 /// use bevy::reflect::Reflect;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 /// use bevy::utils::Instant;
 ///
 /// #[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
@@ -203,8 +203,8 @@ impl<A: Actionlike> ActionState<A> {
     /// # Example
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
-    /// use leafwing_input_manager::buttonlike::ButtonState;
+    /// use input_manager::prelude::*;
+    /// use input_manager::buttonlike::ButtonState;
     /// use bevy::utils::Instant;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
@@ -308,8 +308,7 @@ impl<A: Actionlike> ActionState<A> {
         self.action_data
             .raw_entry_mut()
             .from_key(action)
-            .or_insert_with(|| (action.clone(), ActionData::default()))
-            .1
+            .or_insert_with(|| (action.clone(), ActionData::default())).1
     }
 
     /// Get the value associated with the corresponding `action` if present.
@@ -351,7 +350,7 @@ impl<A: Actionlike> ActionState<A> {
     ///
     /// This value will be 0. if the action has never been pressed or released.
     pub fn clamped_value(&self, action: &A) -> f32 {
-        self.value(action).clamp(-1., 1.)
+        self.value(action).clamp(-1.0, 1.0)
     }
 
     /// Get the [`DualAxisData`] from the binding that triggered the corresponding `action`.
@@ -374,8 +373,9 @@ impl<A: Actionlike> ActionState<A> {
 
     /// Get the [`DualAxisData`] associated with the corresponding `action`, clamped to `[-1.0, 1.0]`.
     pub fn clamped_axis_pair(&self, action: &A) -> Option<DualAxisData> {
-        self.axis_pair(action)
-            .map(|pair| DualAxisData::new(pair.x().clamp(-1.0, 1.0), pair.y().clamp(-1.0, 1.0)))
+        self.axis_pair(action).map(|pair|
+            DualAxisData::new(pair.x().clamp(-1.0, 1.0), pair.y().clamp(-1.0, 1.0))
+        )
     }
 
     /// Manually sets the [`ActionData`] of the corresponding `action`
@@ -388,7 +388,7 @@ impl<A: Actionlike> ActionState<A> {
     /// # Example
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     /// enum AbilitySlot {
@@ -479,7 +479,7 @@ impl<A: Actionlike> ActionState<A> {
     ///
     /// ```rust
     /// use bevy::prelude::Reflect;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     /// enum Action {
@@ -705,13 +705,13 @@ impl<A: Actionlike> ActionState<A> {
             ActionDiff::Pressed { action } => {
                 self.press(action);
                 // Pressing will initialize the ActionData if it doesn't exist
-                self.action_data_mut(action).unwrap().value = 1.;
+                self.action_data_mut(action).unwrap().value = 1.0;
             }
             ActionDiff::Released { action } => {
                 self.release(action);
                 // Releasing will initialize the ActionData if it doesn't exist
                 let action_data = self.action_data_mut(action).unwrap();
-                action_data.value = 0.;
+                action_data.value = 0.0;
                 action_data.axis_pair = None;
             }
             ActionDiff::ValueChanged { action, value } => {
@@ -726,7 +726,7 @@ impl<A: Actionlike> ActionState<A> {
                 action_data.axis_pair = Some(DualAxisData::from_xy(*axis_pair));
                 action_data.value = axis_pair.length();
             }
-        };
+        }
     }
 
     /// Returns an owned list of the [`Actionlike`] keys in this [`ActionState`].
@@ -739,7 +739,7 @@ impl<A: Actionlike> ActionState<A> {
 
 #[cfg(test)]
 mod tests {
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use crate::action_state::ActionState;
     use crate::clashing_inputs::ClashStrategy;
     use crate::input_map::InputMap;
@@ -748,8 +748,8 @@ mod tests {
     use crate::prelude::InputChord;
     use bevy::input::InputPlugin;
     use bevy::prelude::*;
-    use bevy::utils::{Duration, Instant};
-    use leafwing_input_manager_macros::Actionlike;
+    use bevy::utils::{ Duration, Instant };
+    use input_manager_macros::Actionlike;
 
     #[test]
     fn press_lifecycle() {
@@ -847,8 +847,9 @@ mod tests {
 
         // Starting state
         let input_streams = InputStreams::from_world(app.world(), None);
-        action_state
-            .update(input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest));
+        action_state.update(
+            input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest)
+        );
         assert!(action_state.released(&Action::One));
         assert!(action_state.released(&Action::Two));
         assert!(action_state.released(&Action::OneAndTwo));
@@ -858,8 +859,9 @@ mod tests {
         app.update();
         let input_streams = InputStreams::from_world(app.world(), None);
 
-        action_state
-            .update(input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest));
+        action_state.update(
+            input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest)
+        );
 
         assert!(action_state.pressed(&Action::One));
         assert!(action_state.released(&Action::Two));
@@ -867,8 +869,9 @@ mod tests {
 
         // Waiting
         action_state.tick(Instant::now(), Instant::now() - Duration::from_micros(1));
-        action_state
-            .update(input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest));
+        action_state.update(
+            input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest)
+        );
 
         assert!(action_state.pressed(&Action::One));
         assert!(action_state.released(&Action::Two));
@@ -879,8 +882,9 @@ mod tests {
         app.update();
         let input_streams = InputStreams::from_world(app.world(), None);
 
-        action_state
-            .update(input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest));
+        action_state.update(
+            input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest)
+        );
 
         // Now only the longest OneAndTwo has been pressed,
         // while both One and Two have been released
@@ -890,8 +894,9 @@ mod tests {
 
         // Waiting
         action_state.tick(Instant::now(), Instant::now() - Duration::from_micros(1));
-        action_state
-            .update(input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest));
+        action_state.update(
+            input_map.process_actions(&input_streams, ClashStrategy::PrioritizeLongest)
+        );
 
         assert!(action_state.released(&Action::One));
         assert!(action_state.released(&Action::Two));

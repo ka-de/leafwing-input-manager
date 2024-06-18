@@ -77,25 +77,39 @@
 //! [`KeyCode`]: bevy::prelude::KeyCode
 //! [`MouseButton`]: bevy::prelude::MouseButton
 
-use std::any::{Any, TypeId};
-use std::fmt::{Debug, Formatter};
-use std::hash::{Hash, Hasher};
+use std::any::{ Any, TypeId };
+use std::fmt::{ Debug, Formatter };
+use std::hash::{ Hash, Hasher };
 use std::sync::RwLock;
 
 use bevy::prelude::App;
-use bevy::reflect::utility::{reflect_hasher, GenericTypePathCell, NonGenericTypeInfoCell};
+use bevy::reflect::utility::{ reflect_hasher, GenericTypePathCell, NonGenericTypeInfoCell };
 use bevy::reflect::{
-    erased_serde, FromReflect, FromType, GetTypeRegistration, Reflect, ReflectDeserialize,
-    ReflectFromPtr, ReflectKind, ReflectMut, ReflectOwned, ReflectRef, ReflectSerialize, TypeInfo,
-    TypePath, TypeRegistration, Typed, ValueInfo,
+    erased_serde,
+    FromReflect,
+    FromType,
+    GetTypeRegistration,
+    Reflect,
+    ReflectDeserialize,
+    ReflectFromPtr,
+    ReflectKind,
+    ReflectMut,
+    ReflectOwned,
+    ReflectRef,
+    ReflectSerialize,
+    TypeInfo,
+    TypePath,
+    TypeRegistration,
+    Typed,
+    ValueInfo,
 };
 use dyn_clone::DynClone;
 use dyn_eq::DynEq;
 use dyn_hash::DynHash;
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{ Deserialize, Deserializer, Serialize, Serializer };
 use serde_flexitos::ser::require_erased_serialize_impl;
-use serde_flexitos::{serialize_trait_object, MapRegistry, Registry};
+use serde_flexitos::{ serialize_trait_object, MapRegistry, Registry };
 
 use crate::axislike::DualAxisData;
 use crate::clashing_inputs::BasicInputs;
@@ -140,11 +154,11 @@ pub enum InputControlKind {
 /// use bevy::prelude::*;
 /// use bevy::math::FloatOrd;
 /// use serde::{Deserialize, Serialize};
-/// use leafwing_input_manager::prelude::*;
-/// use leafwing_input_manager::input_streams::InputStreams;
-/// use leafwing_input_manager::axislike::{DualAxisType, DualAxisData};
-/// use leafwing_input_manager::raw_inputs::RawInputs;
-/// use leafwing_input_manager::clashing_inputs::BasicInputs;
+/// use input_manager::prelude::*;
+/// use input_manager::input_streams::InputStreams;
+/// use input_manager::axislike::{DualAxisType, DualAxisData};
+/// use input_manager::raw_inputs::RawInputs;
+/// use input_manager::clashing_inputs::BasicInputs;
 ///
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Serialize, Deserialize)]
 /// pub struct MouseScrollAlwaysFiveOnYAxis;
@@ -202,8 +216,14 @@ pub enum InputControlKind {
 /// let mut app = App::new();
 /// app.register_user_input::<MouseScrollAlwaysFiveOnYAxis>();
 /// ```
-pub trait UserInput:
-    Send + Sync + Debug + DynClone + DynEq + DynHash + Reflect + erased_serde::Serialize
+pub trait UserInput: Send +
+    Sync +
+    Debug +
+    DynClone +
+    DynEq +
+    DynHash +
+    Reflect +
+    erased_serde::Serialize
 {
     /// Defines the kind of behavior that the input should be.
     fn kind(&self) -> InputControlKind;
@@ -278,11 +298,7 @@ impl Reflect for Box<dyn UserInput> {
                     .unwrap_or_default()
                     .to_string()
                     .into_boxed_str(),
-                to_type: self
-                    .reflect_type_ident()
-                    .unwrap_or_default()
-                    .to_string()
-                    .into_boxed_str(),
+                to_type: self.reflect_type_ident().unwrap_or_default().to_string().into_boxed_str(),
             })
         }
     }
@@ -348,9 +364,7 @@ impl TypePath for Box<dyn UserInput> {
     fn type_path() -> &'static str {
         static CELL: GenericTypePathCell = GenericTypePathCell::new();
         CELL.get_or_insert::<Self, _>(|| {
-            {
-                format!("std::boxed::Box<dyn {}::UserInput>", module_path!())
-            }
+            { format!("std::boxed::Box<dyn {}::UserInput>", module_path!()) }
         })
     }
 
@@ -389,10 +403,7 @@ impl FromReflect for Box<dyn UserInput> {
 }
 
 impl<'a> Serialize for dyn UserInput + 'a {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: Serializer {
         // Check that `UserInput` has `erased_serde::Serialize` as a super trait,
         // preventing infinite recursion at runtime.
         const fn __check_erased_serialize_super_trait<T: ?Sized + UserInput>() {
@@ -403,31 +414,27 @@ impl<'a> Serialize for dyn UserInput + 'a {
 }
 
 impl<'de> Deserialize<'de> for Box<dyn UserInput> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: Deserializer<'de> {
         let registry = unsafe { INPUT_REGISTRY.read().unwrap() };
         registry.deserialize_trait_object(deserializer)
     }
 }
 
 /// Registry of deserializers for [`UserInput`]s.
-static mut INPUT_REGISTRY: Lazy<RwLock<MapRegistry<dyn UserInput>>> =
-    Lazy::new(|| RwLock::new(MapRegistry::new("UserInput")));
+static mut INPUT_REGISTRY: Lazy<RwLock<MapRegistry<dyn UserInput>>> = Lazy::new(||
+    RwLock::new(MapRegistry::new("UserInput"))
+);
 
 /// A trait for registering a specific [`UserInput`].
 pub trait RegisterUserInput {
     /// Registers the specified [`UserInput`].
     fn register_user_input<'de, T>(&mut self) -> &mut Self
-    where
-        T: RegisterTypeTag<'de, dyn UserInput> + GetTypeRegistration;
+        where T: RegisterTypeTag<'de, dyn UserInput> + GetTypeRegistration;
 }
 
 impl RegisterUserInput for App {
     fn register_user_input<'de, T>(&mut self) -> &mut Self
-    where
-        T: RegisterTypeTag<'de, dyn UserInput> + GetTypeRegistration,
+        where T: RegisterTypeTag<'de, dyn UserInput> + GetTypeRegistration
     {
         let mut registry = unsafe { INPUT_REGISTRY.write().unwrap() };
         T::register_typetag(&mut registry);

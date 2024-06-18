@@ -61,7 +61,7 @@ and a single input can result in multiple actions being triggered, which can be 
 
 ```rust, ignore
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()

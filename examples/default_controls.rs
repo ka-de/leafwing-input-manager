@@ -1,7 +1,7 @@
 //! Demonstrates how to create default controls for an `Actionlike` and add it to an `InputMap`
 
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -43,11 +43,7 @@ struct Player;
 
 fn spawn_player(mut commands: Commands) {
     // Spawn the player with the default input_map
-    commands
-        .spawn(InputManagerBundle::with_map(
-            PlayerAction::default_input_map(),
-        ))
-        .insert(Player);
+    commands.spawn(InputManagerBundle::with_map(PlayerAction::default_input_map())).insert(Player);
 }
 
 fn use_actions(query: Query<&ActionState<PlayerAction>, With<Player>>) {
@@ -57,10 +53,7 @@ fn use_actions(query: Query<&ActionState<PlayerAction>, With<Player>>) {
     if action_state.pressed(&PlayerAction::Run) {
         println!(
             "Moving in direction {}",
-            action_state
-                .clamped_axis_pair(&PlayerAction::Run)
-                .unwrap()
-                .xy()
+            action_state.clamped_axis_pair(&PlayerAction::Run).unwrap().xy()
         );
     }
 

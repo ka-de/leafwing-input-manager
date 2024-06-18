@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -24,15 +24,15 @@ struct Player;
 
 fn spawn_player(mut commands: Commands) {
     // Stores "which actions are currently activated"
-    let input_map = InputMap::new([(
-        Action::Move,
-        // Define a virtual D-pad using four arbitrary keys.
-        // You can also use GamepadVirtualDPad to create similar ones using gamepad buttons.
-        KeyboardVirtualDPad::new(KeyCode::KeyW, KeyCode::KeyS, KeyCode::KeyA, KeyCode::KeyD),
-    )]);
-    commands
-        .spawn(InputManagerBundle::with_map(input_map))
-        .insert(Player);
+    let input_map = InputMap::new([
+        (
+            Action::Move,
+            // Define a virtual D-pad using four arbitrary keys.
+            // You can also use GamepadVirtualDPad to create similar ones using gamepad buttons.
+            KeyboardVirtualDPad::new(KeyCode::KeyW, KeyCode::KeyS, KeyCode::KeyA, KeyCode::KeyD),
+        ),
+    ]);
+    commands.spawn(InputManagerBundle::with_map(input_map)).insert(Player);
 }
 
 // Query for the `ActionState` component in your game logic systems!

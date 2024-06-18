@@ -1,21 +1,29 @@
 //! Gamepad inputs
 
 use bevy::prelude::{
-    Gamepad, GamepadAxis, GamepadAxisType, GamepadButton, GamepadButtonType, Reflect, Vec2,
+    Gamepad,
+    GamepadAxis,
+    GamepadAxisType,
+    GamepadButton,
+    GamepadButtonType,
+    Reflect,
+    Vec2,
 };
-use leafwing_input_manager_macros::serde_typetag;
-use serde::{Deserialize, Serialize};
+use input_manager_macros::serde_typetag;
+use serde::{ Deserialize, Serialize };
 
-use crate as leafwing_input_manager;
-use crate::axislike::{AxisDirection, DualAxisData};
+use crate as input_manager;
+use crate::axislike::{ AxisDirection, DualAxisData };
 use crate::clashing_inputs::BasicInputs;
 use crate::input_processing::{
-    AxisProcessor, DualAxisProcessor, WithAxisProcessingPipelineExt,
+    AxisProcessor,
+    DualAxisProcessor,
+    WithAxisProcessingPipelineExt,
     WithDualAxisProcessingPipelineExt,
 };
 use crate::input_streams::InputStreams;
 use crate::raw_inputs::RawInputs;
-use crate::user_input::{InputControlKind, UserInput};
+use crate::user_input::{ InputControlKind, UserInput };
 
 /// Retrieves the current value of the specified `axis`.
 #[must_use]
@@ -29,8 +37,7 @@ fn read_axis_value(input_streams: &InputStreams, axis: GamepadAxisType) -> f32 {
     if let Some(gamepad) = input_streams.associated_gamepad {
         gamepad_value_self(gamepad).unwrap_or_default()
     } else {
-        input_streams
-            .gamepads
+        input_streams.gamepads
             .iter()
             .filter_map(gamepad_value_self)
             .find(|value| *value != 0.0)
@@ -55,7 +62,7 @@ fn read_axis_value(input_streams: &InputStreams, axis: GamepadAxisType) -> f32 {
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
 /// use bevy::input::gamepad::GamepadEvent;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -183,7 +190,7 @@ impl UserInput for GamepadControlDirection {
 /// ```rust,ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -264,9 +271,7 @@ impl UserInput for GamepadControlAxis {
     #[inline]
     fn value(&self, input_streams: &InputStreams) -> f32 {
         let value = read_axis_value(input_streams, self.axis);
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 
     /// Always returns [`None`] as [`GamepadControlAxis`] doesn't represent dual-axis input.
@@ -279,10 +284,12 @@ impl UserInput for GamepadControlAxis {
     /// [`GamepadControlAxis`] represents a composition of two [`GamepadControlDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(GamepadControlDirection::negative(self.axis)),
-            Box::new(GamepadControlDirection::positive(self.axis)),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(GamepadControlDirection::negative(self.axis)),
+                Box::new(GamepadControlDirection::positive(self.axis))
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from the [`GamepadAxisType`] used by the axis.
@@ -302,7 +309,7 @@ impl WithAxisProcessingPipelineExt for GamepadControlAxis {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -332,7 +339,7 @@ impl WithAxisProcessingPipelineExt for GamepadControlAxis {
 /// ```rust,ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -383,9 +390,7 @@ impl GamepadStick {
     fn processed_value(&self, input_streams: &InputStreams) -> Vec2 {
         let x = read_axis_value(input_streams, self.x);
         let y = read_axis_value(input_streams, self.y);
-        self.processors
-            .iter()
-            .fold(Vec2::new(x, y), |value, processor| processor.process(value))
+        self.processors.iter().fold(Vec2::new(x, y), |value, processor| processor.process(value))
     }
 }
 
@@ -423,12 +428,14 @@ impl UserInput for GamepadStick {
     /// [`GamepadStick`] represents a composition of four [`GamepadControlDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(GamepadControlDirection::negative(self.x)),
-            Box::new(GamepadControlDirection::positive(self.x)),
-            Box::new(GamepadControlDirection::negative(self.y)),
-            Box::new(GamepadControlDirection::positive(self.y)),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(GamepadControlDirection::negative(self.x)),
+                Box::new(GamepadControlDirection::positive(self.x)),
+                Box::new(GamepadControlDirection::negative(self.y)),
+                Box::new(GamepadControlDirection::positive(self.y))
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from two [`GamepadAxisType`]s used by the stick.
@@ -448,7 +455,7 @@ impl WithDualAxisProcessingPipelineExt for GamepadStick {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processor: impl IntoIterator<Item = DualAxisProcessor>,
+        processor: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self {
         self.processors = processor.into_iter().collect();
         self
@@ -467,7 +474,7 @@ impl WithDualAxisProcessingPipelineExt for GamepadStick {
 fn button_pressed(
     input_streams: &InputStreams,
     gamepad: Gamepad,
-    button: GamepadButtonType,
+    button: GamepadButtonType
 ) -> bool {
     let button = GamepadButton::new(gamepad, button);
     input_streams.gamepad_buttons.pressed(button)
@@ -477,10 +484,7 @@ fn button_pressed(
 #[must_use]
 #[inline]
 fn button_pressed_any(input_streams: &InputStreams, button: GamepadButtonType) -> bool {
-    input_streams
-        .gamepads
-        .iter()
-        .any(|gamepad| button_pressed(input_streams, gamepad, button))
+    input_streams.gamepads.iter().any(|gamepad| button_pressed(input_streams, gamepad, button))
 }
 
 /// Retrieves the current value of the given [`GamepadButtonType`].
@@ -489,7 +493,7 @@ fn button_pressed_any(input_streams: &InputStreams, button: GamepadButtonType) -
 fn button_value(
     input_streams: &InputStreams,
     gamepad: Gamepad,
-    button: GamepadButtonType,
+    button: GamepadButtonType
 ) -> Option<f32> {
     // This implementation differs from `button_pressed()`
     // because the upstream bevy::input still waffles about whether triggers are buttons or axes.
@@ -535,8 +539,9 @@ impl UserInput for GamepadButtonType {
     #[inline]
     fn value(&self, input_streams: &InputStreams) -> f32 {
         if let Some(gamepad) = input_streams.associated_gamepad {
-            button_value(input_streams, gamepad, *self)
-                .unwrap_or_else(|| f32::from(button_pressed(input_streams, gamepad, *self)))
+            button_value(input_streams, gamepad, *self).unwrap_or_else(||
+                f32::from(button_pressed(input_streams, gamepad, *self))
+            )
         } else {
             button_value_any(input_streams, *self)
         }
@@ -584,7 +589,7 @@ impl UserInput for GamepadButtonType {
 /// ```rust,ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -683,9 +688,7 @@ impl UserInput for GamepadVirtualAxis {
             let positive = button_value_any(input_streams, self.positive);
             positive - negative
         };
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 
     /// Always returns [`None`] as [`GamepadVirtualAxis`] doesn't represent dual-axis input.
@@ -718,7 +721,7 @@ impl WithAxisProcessingPipelineExt for GamepadVirtualAxis {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -753,7 +756,7 @@ impl WithAxisProcessingPipelineExt for GamepadVirtualAxis {
 /// ```rust,ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -797,7 +800,7 @@ impl GamepadVirtualDPad {
         up: GamepadButtonType,
         down: GamepadButtonType,
         left: GamepadButtonType,
-        right: GamepadButtonType,
+        right: GamepadButtonType
     ) -> Self {
         Self {
             up,
@@ -818,7 +821,7 @@ impl GamepadVirtualDPad {
         GamepadButtonType::DPadUp,
         GamepadButtonType::DPadDown,
         GamepadButtonType::DPadLeft,
-        GamepadButtonType::DPadRight,
+        GamepadButtonType::DPadRight
     );
 
     /// Creates a new [`GamepadVirtualDPad`] using the common action pad button mappings.
@@ -831,7 +834,7 @@ impl GamepadVirtualDPad {
         GamepadButtonType::North,
         GamepadButtonType::South,
         GamepadButtonType::West,
-        GamepadButtonType::East,
+        GamepadButtonType::East
     );
 
     /// Retrieves the current X and Y values of this D-pad after processing by the associated processors.
@@ -850,9 +853,7 @@ impl GamepadVirtualDPad {
             let right = button_value_any(input_streams, self.right);
             Vec2::new(right - left, up - down)
         };
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 }
 
@@ -889,12 +890,9 @@ impl UserInput for GamepadVirtualDPad {
     /// Returns the four [`GamepadButtonType`]s used by this D-pad.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(self.up),
-            Box::new(self.down),
-            Box::new(self.left),
-            Box::new(self.right),
-        ])
+        BasicInputs::Composite(
+            vec![Box::new(self.up), Box::new(self.down), Box::new(self.left), Box::new(self.right)]
+        )
     }
 
     /// Creates a [`RawInputs`] from four [`GamepadButtonType`]s used by this D-pad.
@@ -914,7 +912,7 @@ impl WithDualAxisProcessingPipelineExt for GamepadVirtualDPad {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processor: impl IntoIterator<Item = DualAxisProcessor>,
+        processor: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self {
         self.processors = processor.into_iter().collect();
         self
@@ -932,7 +930,10 @@ mod tests {
     use super::*;
     use crate::input_mocking::MockInput;
     use bevy::input::gamepad::{
-        GamepadConnection, GamepadConnectionEvent, GamepadEvent, GamepadInfo,
+        GamepadConnection,
+        GamepadConnectionEvent,
+        GamepadEvent,
+        GamepadInfo,
     };
     use bevy::input::InputPlugin;
     use bevy::prelude::*;
@@ -944,13 +945,15 @@ mod tests {
         // WARNING: you MUST register your gamepad during tests,
         // or all gamepad input mocking actions will fail
         let mut gamepad_events = app.world_mut().resource_mut::<Events<GamepadEvent>>();
-        gamepad_events.send(GamepadEvent::Connection(GamepadConnectionEvent {
-            // This MUST be consistent with any other mocked events
-            gamepad: Gamepad { id: 1 },
-            connection: GamepadConnection::Connected(GamepadInfo {
-                name: "TestController".into(),
-            }),
-        }));
+        gamepad_events.send(
+            GamepadEvent::Connection(GamepadConnectionEvent {
+                // This MUST be consistent with any other mocked events
+                gamepad: Gamepad { id: 1 },
+                connection: GamepadConnection::Connected(GamepadInfo {
+                    name: "TestController".into(),
+                }),
+            })
+        );
 
         // Ensure that the gamepad is picked up by the appropriate system
         app.update();
@@ -965,7 +968,7 @@ mod tests {
         input_streams: &InputStreams,
         expected_pressed: bool,
         expected_value: f32,
-        expected_axis_pair: Option<DualAxisData>,
+        expected_axis_pair: Option<DualAxisData>
     ) {
         assert_eq!(input.pressed(input_streams), expected_pressed);
         assert_eq!(input.value(input_streams), expected_value);

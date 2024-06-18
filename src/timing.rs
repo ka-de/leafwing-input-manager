@@ -1,10 +1,7 @@
 //! Information about when an action was pressed or released.
 
-use bevy::{
-    reflect::Reflect,
-    utils::{Duration, Instant},
-};
-use serde::{Deserialize, Serialize};
+use bevy::{ reflect::Reflect, utils::{ Duration, Instant } };
+use serde::{ Deserialize, Serialize };
 
 /// Stores information about when an action was pressed or released
 ///
@@ -57,9 +54,9 @@ impl Timing {
 
 #[cfg(test)]
 mod tests {
-    use crate as leafwing_input_manager;
+    use crate as input_manager;
     use bevy::prelude::Reflect;
-    use leafwing_input_manager_macros::Actionlike;
+    use input_manager_macros::Actionlike;
 
     #[derive(Actionlike, Clone, Copy, PartialEq, Eq, Hash, Debug, Reflect)]
     enum Action {
@@ -71,7 +68,7 @@ mod tests {
     #[test]
     fn time_tick_ticks_away() {
         use crate::action_state::ActionState;
-        use bevy::utils::{Duration, Instant};
+        use bevy::utils::{ Duration, Instant };
 
         let mut action_state = ActionState::<Action>::default();
 
@@ -95,28 +92,22 @@ mod tests {
     #[test]
     fn durations() {
         use crate::action_state::ActionState;
-        use bevy::utils::{Duration, Instant};
+        use bevy::utils::{ Duration, Instant };
 
         let mut action_state = ActionState::<Action>::default();
 
         // Actions start released
         assert!(action_state.released(&Action::Jump));
-        assert_eq!(action_state.instant_started(&Action::Jump), None,);
+        assert_eq!(action_state.instant_started(&Action::Jump), None);
         assert_eq!(action_state.current_duration(&Action::Jump), Duration::ZERO);
-        assert_eq!(
-            action_state.previous_duration(&Action::Jump),
-            Duration::ZERO
-        );
+        assert_eq!(action_state.previous_duration(&Action::Jump), Duration::ZERO);
 
         // Pressing a button swaps the state
         action_state.press(&Action::Jump);
         assert!(action_state.pressed(&Action::Jump));
         assert_eq!(action_state.instant_started(&Action::Jump), None);
         assert_eq!(action_state.current_duration(&Action::Jump), Duration::ZERO);
-        assert_eq!(
-            action_state.previous_duration(&Action::Jump),
-            Duration::ZERO
-        );
+        assert_eq!(action_state.previous_duration(&Action::Jump), Duration::ZERO);
 
         // Ticking time sets the instant for the new state
         let t0 = Instant::now();
@@ -125,10 +116,7 @@ mod tests {
         action_state.tick(t1, t0);
         assert_eq!(action_state.instant_started(&Action::Jump), Some(t0));
         assert_eq!(action_state.current_duration(&Action::Jump), t1 - t0);
-        assert_eq!(
-            action_state.previous_duration(&Action::Jump),
-            Duration::ZERO
-        );
+        assert_eq!(action_state.previous_duration(&Action::Jump), Duration::ZERO);
 
         // Time passes
         let t2 = t1 + Duration::new(5, 0);
@@ -137,10 +125,7 @@ mod tests {
         action_state.tick(t2, t1);
         assert_eq!(action_state.instant_started(&Action::Jump), Some(t0));
         assert_eq!(action_state.current_duration(&Action::Jump), t2 - t0);
-        assert_eq!(
-            action_state.previous_duration(&Action::Jump),
-            Duration::ZERO
-        );
+        assert_eq!(action_state.previous_duration(&Action::Jump), Duration::ZERO);
 
         // Releasing again, swapping the current duration to the previous one
         action_state.release(&Action::Jump);

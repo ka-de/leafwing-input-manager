@@ -1,7 +1,7 @@
 //! Demonstrates how to "consume" actions, so they can only be responded to by a single system
 
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 use menu_mocking::*;
 
@@ -10,11 +10,13 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(InputManagerPlugin::<MenuAction>::default())
         .init_resource::<ActionState<MenuAction>>()
-        .insert_resource(InputMap::<MenuAction>::new([
-            (MenuAction::CloseWindow, KeyCode::Escape),
-            (MenuAction::OpenMainMenu, KeyCode::KeyM),
-            (MenuAction::OpenSubMenu, KeyCode::KeyS),
-        ]))
+        .insert_resource(
+            InputMap::<MenuAction>::new([
+                (MenuAction::CloseWindow, KeyCode::Escape),
+                (MenuAction::OpenMainMenu, KeyCode::KeyM),
+                (MenuAction::OpenSubMenu, KeyCode::KeyS),
+            ])
+        )
         .init_resource::<MainMenu>()
         .init_resource::<SubMenu>()
         .add_systems(Update, report_menus)
@@ -39,9 +41,9 @@ enum MenuAction {
 fn report_menus(main_menu: Res<MainMenu>, submenu: Res<SubMenu>) {
     if main_menu.is_changed() {
         if main_menu.is_open() {
-            println!("The main menu is now open.")
+            println!("The main menu is now open.");
         } else {
-            println!("The main menu is now closed.")
+            println!("The main menu is now closed.");
         }
     }
 
@@ -72,7 +74,7 @@ fn open_sub_menu(action_state: Res<ActionState<MenuAction>>, mut menu_state: Res
 // as it is an immediate mode UI library
 fn close_menu<M: Resource + Menu>(
     mut action_state: ResMut<ActionState<MenuAction>>,
-    mut menu_status: ResMut<M>,
+    mut menu_status: ResMut<M>
 ) {
     if action_state.pressed(&MenuAction::CloseWindow) && menu_status.is_open() {
         println!("Closing the top window, as requested.");

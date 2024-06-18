@@ -1,16 +1,16 @@
 //! Mouse inputs
 
-use bevy::prelude::{MouseButton, Reflect, Vec2};
-use leafwing_input_manager_macros::serde_typetag;
-use serde::{Deserialize, Serialize};
+use bevy::prelude::{ MouseButton, Reflect, Vec2 };
+use input_manager_macros::serde_typetag;
+use serde::{ Deserialize, Serialize };
 
-use crate as leafwing_input_manager;
-use crate::axislike::{DualAxisData, DualAxisDirection, DualAxisType};
+use crate as input_manager;
+use crate::axislike::{ DualAxisData, DualAxisDirection, DualAxisType };
 use crate::clashing_inputs::BasicInputs;
 use crate::input_processing::*;
 use crate::input_streams::InputStreams;
 use crate::raw_inputs::RawInputs;
-use crate::user_input::{InputControlKind, UserInput};
+use crate::user_input::{ InputControlKind, UserInput };
 
 // Built-in support for Bevy's MouseButton
 #[serde_typetag]
@@ -24,9 +24,7 @@ impl UserInput for MouseButton {
     /// Checks if the specified button is currently pressed down.
     #[inline]
     fn pressed(&self, input_streams: &InputStreams) -> bool {
-        input_streams
-            .mouse_buttons
-            .is_some_and(|buttons| buttons.pressed(*self))
+        input_streams.mouse_buttons.is_some_and(|buttons| buttons.pressed(*self))
     }
 
     /// Retrieves the strength of the button press for the specified button.
@@ -68,8 +66,7 @@ fn accumulate_mouse_movement(input_streams: &InputStreams) -> Vec2 {
     // PERF: this summing is computed for every individual input
     // This should probably be computed once, and then cached / read
     // Fix upstream!
-    input_streams
-        .mouse_motion
+    input_streams.mouse_motion
         .iter()
         .map(|event| event.delta)
         .sum()
@@ -87,7 +84,7 @@ fn accumulate_mouse_movement(input_streams: &InputStreams) -> Vec2 {
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -179,7 +176,7 @@ impl UserInput for MouseMoveDirection {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -242,9 +239,7 @@ impl UserInput for MouseMoveAxis {
     fn value(&self, input_streams: &InputStreams) -> f32 {
         let movement = accumulate_mouse_movement(input_streams);
         let value = self.axis.get_value(movement);
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 
     /// Always returns [`None`] as [`MouseMoveAxis`] doesn't represent dual-axis input.
@@ -257,10 +252,12 @@ impl UserInput for MouseMoveAxis {
     /// [`MouseMoveAxis`] represents a composition of two [`MouseMoveDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(MouseMoveDirection(self.axis.negative())),
-            Box::new(MouseMoveDirection(self.axis.positive())),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(MouseMoveDirection(self.axis.negative())),
+                Box::new(MouseMoveDirection(self.axis.positive()))
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from the [`DualAxisType`] used by the axis.
@@ -280,7 +277,7 @@ impl WithAxisProcessingPipelineExt for MouseMoveAxis {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -306,7 +303,7 @@ impl WithAxisProcessingPipelineExt for MouseMoveAxis {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -335,9 +332,7 @@ impl MouseMove {
     #[inline]
     fn processed_value(&self, input_streams: &InputStreams) -> Vec2 {
         let movement = accumulate_mouse_movement(input_streams);
-        self.processors
-            .iter()
-            .fold(movement, |value, processor| processor.process(value))
+        self.processors.iter().fold(movement, |value, processor| processor.process(value))
     }
 }
 
@@ -373,12 +368,14 @@ impl UserInput for MouseMove {
     /// [`MouseMove`] represents a composition of four [`MouseMoveDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(MouseMoveDirection::UP),
-            Box::new(MouseMoveDirection::DOWN),
-            Box::new(MouseMoveDirection::LEFT),
-            Box::new(MouseMoveDirection::RIGHT),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(MouseMoveDirection::UP),
+                Box::new(MouseMoveDirection::DOWN),
+                Box::new(MouseMoveDirection::LEFT),
+                Box::new(MouseMoveDirection::RIGHT)
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from two [`DualAxisType`]s used by the input.
@@ -398,7 +395,7 @@ impl WithDualAxisProcessingPipelineExt for MouseMove {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processor: impl IntoIterator<Item = DualAxisProcessor>,
+        processor: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self {
         self.processors = processor.into_iter().collect();
         self
@@ -422,7 +419,10 @@ fn accumulate_wheel_movement(input_streams: &InputStreams) -> Vec2 {
     // PERF: this summing is computed for every individual input
     // This should probably be computed once, and then cached / read
     // Fix upstream!
-    wheel.iter().map(|event| Vec2::new(event.x, event.y)).sum()
+    wheel
+        .iter()
+        .map(|event| Vec2::new(event.x, event.y))
+        .sum()
 }
 
 /// Provides button-like behavior for mouse wheel scrolling in cardinal directions.
@@ -437,7 +437,7 @@ fn accumulate_wheel_movement(input_streams: &InputStreams) -> Vec2 {
 /// ```rust, ignore
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -529,7 +529,7 @@ impl UserInput for MouseScrollDirection {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -592,9 +592,7 @@ impl UserInput for MouseScrollAxis {
     fn value(&self, input_streams: &InputStreams) -> f32 {
         let movement = accumulate_wheel_movement(input_streams);
         let value = self.axis.get_value(movement);
-        self.processors
-            .iter()
-            .fold(value, |value, processor| processor.process(value))
+        self.processors.iter().fold(value, |value, processor| processor.process(value))
     }
 
     /// Always returns [`None`] as [`MouseScrollAxis`] doesn't represent dual-axis input.
@@ -607,10 +605,12 @@ impl UserInput for MouseScrollAxis {
     /// [`MouseScrollAxis`] represents a composition of two [`MouseScrollDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(MouseScrollDirection(self.axis.negative())),
-            Box::new(MouseScrollDirection(self.axis.positive())),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(MouseScrollDirection(self.axis.negative())),
+                Box::new(MouseScrollDirection(self.axis.positive()))
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from the [`DualAxisType`] used by the axis.
@@ -630,7 +630,7 @@ impl WithAxisProcessingPipelineExt for MouseScrollAxis {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = AxisProcessor>,
+        processors: impl IntoIterator<Item = AxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -655,7 +655,7 @@ impl WithAxisProcessingPipelineExt for MouseScrollAxis {
 /// ```rust
 /// use bevy::prelude::*;
 /// use bevy::input::InputPlugin;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let mut app = App::new();
 /// app.add_plugins(InputPlugin);
@@ -684,9 +684,7 @@ impl MouseScroll {
     #[inline]
     fn processed_value(&self, input_streams: &InputStreams) -> Vec2 {
         let movement = accumulate_wheel_movement(input_streams);
-        self.processors
-            .iter()
-            .fold(movement, |value, processor| processor.process(value))
+        self.processors.iter().fold(movement, |value, processor| processor.process(value))
     }
 }
 
@@ -722,12 +720,14 @@ impl UserInput for MouseScroll {
     /// [`MouseScroll`] represents a composition of four [`MouseScrollDirection`]s.
     #[inline]
     fn decompose(&self) -> BasicInputs {
-        BasicInputs::Composite(vec![
-            Box::new(MouseScrollDirection::UP),
-            Box::new(MouseScrollDirection::DOWN),
-            Box::new(MouseScrollDirection::LEFT),
-            Box::new(MouseScrollDirection::RIGHT),
-        ])
+        BasicInputs::Composite(
+            vec![
+                Box::new(MouseScrollDirection::UP),
+                Box::new(MouseScrollDirection::DOWN),
+                Box::new(MouseScrollDirection::LEFT),
+                Box::new(MouseScrollDirection::RIGHT)
+            ]
+        )
     }
 
     /// Creates a [`RawInputs`] from two [`DualAxisType`] used by the input.
@@ -747,7 +747,7 @@ impl WithDualAxisProcessingPipelineExt for MouseScroll {
     #[inline]
     fn replace_processing_pipeline(
         mut self,
-        processors: impl IntoIterator<Item = DualAxisProcessor>,
+        processors: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self {
         self.processors = processors.into_iter().collect();
         self
@@ -778,7 +778,7 @@ mod tests {
         input_streams: &InputStreams,
         expected_pressed: bool,
         expected_value: f32,
-        expected_axis_pair: Option<DualAxisData>,
+        expected_axis_pair: Option<DualAxisData>
     ) {
         assert_eq!(input.pressed(input_streams), expected_pressed);
         assert_eq!(input.value(input_streams), expected_value);

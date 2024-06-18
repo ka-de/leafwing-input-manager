@@ -1,10 +1,10 @@
 [package]
-name = "leafwing-input-manager"
+name = "input-manager"
 description = "A powerfully direct stateful input manager for the Bevy game engine."
 version = "0.14.0"
 authors = ["Leafwing Studios"]
 homepage = "https://leafwing-studios.com/"
-repository = "https://github.com/leafwing-studios/leafwing-input-manager"
+repository = "https://github.com/ka-de/input-manager"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 categories = ["games", "game-development"]
@@ -35,12 +35,14 @@ ui = ['bevy/bevy_ui']
 egui = ['dep:bevy_egui']
 
 [dependencies]
-leafwing_input_manager_macros = { path = "macros", version = "0.13" }
-bevy = { version = "0.14.0-rc.2", default-features = false, features = [
+input_manager_macros = { path = "macros", version = "0.13" }
+bevy = { git = "https://github.com/bevyengine/bevy", default-features = false, features = [
   "serialize",
 ] }
-bevy_ecs = { version = "0.14.0-rc.2", features = ["serde"] }
-bevy_egui = { git = "https://github.com/Friz64/bevy_egui", branch = "bevy-0.14", optional = true }
+bevy_ecs = { git = "https://github.com/bevyengine/bevy", features = [
+  "serialize",
+] }
+bevy_egui = { git = "https://github.com/ka-de/bevy_egui", branch = "0.14", optional = true }
 
 derive_more = { version = "0.99", default-features = false, features = [
   "display",
@@ -55,8 +57,10 @@ dyn-hash = "0.2"
 once_cell = "1.19"
 
 [dev-dependencies]
-bevy_ecs = { version = "0.14.0-rc.2", features = ["serde"] }
-bevy = { version = "0.14.0-rc.2", default-features = false, features = [
+bevy_ecs = { git = "https://github.com/bevyengine/bevy", features = [
+  "serialize",
+] }
+bevy = { git = "https://github.com/bevyengine/bevy", default-features = false, features = [
   "bevy_asset",
   "bevy_sprite",
   "bevy_text",
@@ -82,7 +86,7 @@ name = "input_map"
 harness = false
 
 [lib]
-name = "leafwing_input_manager"
+name = "input_manager"
 path = "src/lib.rs"
 
 

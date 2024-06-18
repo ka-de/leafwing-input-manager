@@ -1,12 +1,9 @@
 //! Processors for dual-axis input values
 
-use std::hash::{Hash, Hasher};
+use std::hash::{ Hash, Hasher };
 
-use bevy::{
-    math::FloatOrd,
-    prelude::{BVec2, Reflect, Vec2},
-};
-use serde::{Deserialize, Serialize};
+use bevy::{ math::FloatOrd, prelude::{ BVec2, Reflect, Vec2 } };
+use serde::{ Deserialize, Serialize };
 
 use crate::input_processing::AxisProcessor;
 
@@ -29,7 +26,7 @@ pub enum DualAxisProcessor {
     ///
     /// ```rust
     /// use bevy::prelude::*;
-    /// use leafwing_input_manager::prelude::*;
+    /// use input_manager::prelude::*;
     ///
     /// // 1.0 for positive values
     /// assert_eq!(DualAxisProcessor::Digital.process(Vec2::splat(2.5)), Vec2::ONE);
@@ -83,10 +80,11 @@ impl DualAxisProcessor {
     #[inline]
     pub fn process(&self, input_value: Vec2) -> Vec2 {
         match self {
-            Self::Digital => Vec2::new(
-                AxisProcessor::Digital.process(input_value.x),
-                AxisProcessor::Digital.process(input_value.y),
-            ),
+            Self::Digital =>
+                Vec2::new(
+                    AxisProcessor::Digital.process(input_value.x),
+                    AxisProcessor::Digital.process(input_value.y)
+                ),
             Self::Inverted(inversion) => inversion.invert(input_value),
             Self::Sensitivity(sensitivity) => sensitivity.scale(input_value),
             Self::ValueBounds(bounds) => bounds.clamp(input_value),
@@ -108,7 +106,7 @@ pub trait WithDualAxisProcessingPipelineExt: Sized {
     /// Replaces the current processing pipeline with the given [`DualAxisProcessor`]s.
     fn replace_processing_pipeline(
         self,
-        processors: impl IntoIterator<Item = DualAxisProcessor>,
+        processors: impl IntoIterator<Item = DualAxisProcessor>
     ) -> Self;
 
     /// Appends the given [`DualAxisProcessor`] as the next processing step.
@@ -342,7 +340,7 @@ pub trait WithDualAxisProcessingPipelineExt: Sized {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let value = Vec2::new(1.5, 2.0);
 /// let Vec2 { x, y } = value;
@@ -403,7 +401,7 @@ impl Hash for DualAxisInverted {
 ///
 /// ```rust
 /// use bevy::prelude::*;
-/// use leafwing_input_manager::prelude::*;
+/// use input_manager::prelude::*;
 ///
 /// let value = Vec2::new(1.5, 2.5);
 /// let Vec2 { x, y } = value;
@@ -502,10 +500,10 @@ mod tests {
         assert_eq!(only_y.inverted(), BVec2::new(false, true));
 
         for x in -300..300 {
-            let x = x as f32 * 0.01;
+            let x = (x as f32) * 0.01;
 
             for y in -300..300 {
-                let y = y as f32 * 0.01;
+                let y = (y as f32) * 0.01;
                 let value = Vec2::new(x, y);
 
                 let processor = DualAxisProcessor::Inverted(all);
@@ -532,10 +530,10 @@ mod tests {
     #[test]
     fn test_dual_axis_sensitivity() {
         for x in -300..300 {
-            let x = x as f32 * 0.01;
+            let x = (x as f32) * 0.01;
 
             for y in -300..300 {
-                let y = y as f32 * 0.01;
+                let y = (y as f32) * 0.01;
                 let value = Vec2::new(x, y);
 
                 let sensitivity = x;
@@ -568,10 +566,7 @@ mod tests {
                 let processor = DualAxisProcessor::Sensitivity(separate);
                 assert_eq!(DualAxisProcessor::from(separate), processor);
                 assert_eq!(processor.process(value), separate.scale(value));
-                assert_eq!(
-                    separate.sensitivities(),
-                    Vec2::new(sensitivity, sensitivity2)
-                );
+                assert_eq!(separate.sensitivities(), Vec2::new(sensitivity, sensitivity2));
                 assert_eq!(separate.scale(value).x, x * sensitivity);
                 assert_eq!(separate.scale(value).y, y * sensitivity2);
             }

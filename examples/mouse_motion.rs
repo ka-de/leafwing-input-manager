@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -22,12 +22,10 @@ fn setup(mut commands: Commands) {
         // via the `MouseMoveDirection` enum.
         (CameraMovement::Pan, MouseMove::default()),
     ]);
-    commands
-        .spawn(Camera2dBundle::default())
-        .insert(InputManagerBundle::with_map(input_map));
+    commands.spawn(Camera2dBundle::default()).insert(InputManagerBundle::with_map(input_map));
 
     commands.spawn(SpriteBundle {
-        transform: Transform::from_scale(Vec3::new(100., 100., 1.)),
+        transform: Transform::from_scale(Vec3::new(100.0, 100.0, 1.0)),
         ..default()
     });
 }

@@ -5,7 +5,7 @@
 use crate::action_state::ActionState;
 use crate::input_map::InputMap;
 use bevy::ecs::prelude::*;
-use bevy::reflect::{FromReflect, Reflect, TypePath};
+use bevy::reflect::{ FromReflect, Reflect, TypePath };
 use std::hash::Hash;
 
 pub mod action_diff;
@@ -29,7 +29,7 @@ pub mod typetag;
 pub mod user_input;
 
 // Importing the derive macro
-pub use leafwing_input_manager_macros::Actionlike;
+pub use input_manager_macros::Actionlike;
 
 /// Everything you need to get started
 pub mod prelude {
@@ -38,14 +38,14 @@ pub mod prelude {
     pub use crate::input_map::InputMap;
     #[cfg(feature = "ui")]
     pub use crate::input_mocking::MockUIInteraction;
-    pub use crate::input_mocking::{MockInput, QueryInput};
+    pub use crate::input_mocking::{ MockInput, QueryInput };
     pub use crate::input_processing::*;
     pub use crate::user_input::*;
 
     pub use crate::plugin::InputManagerPlugin;
-    pub use crate::{Actionlike, InputManagerBundle};
+    pub use crate::{ Actionlike, InputManagerBundle };
 
-    pub use leafwing_input_manager_macros::serde_typetag;
+    pub use input_manager_macros::serde_typetag;
 }
 
 /// Allows a type to be used as a gameplay action in an input-agnostic fashion
@@ -63,7 +63,7 @@ pub mod prelude {
 /// # Example
 /// ```rust
 /// use bevy::prelude::Reflect;
-/// use leafwing_input_manager::Actionlike;
+/// use input_manager::Actionlike;
 ///
 /// #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Reflect)]
 /// enum PlayerAction {
@@ -80,10 +80,15 @@ pub mod prelude {
 ///    Ultimate,
 /// }
 /// ```
-pub trait Actionlike:
-    Eq + Hash + Send + Sync + Clone + Reflect + TypePath + FromReflect + 'static
-{
-}
+pub trait Actionlike: Eq +
+    Hash +
+    Send +
+    Sync +
+    Clone +
+    Reflect +
+    TypePath +
+    FromReflect +
+    'static {}
 
 /// This [`Bundle`] allows entities to collect and interpret inputs from across input sources
 ///

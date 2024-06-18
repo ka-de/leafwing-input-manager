@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use leafwing_input_manager::prelude::*;
+use input_manager::prelude::*;
 
 fn main() {
     App::new()
@@ -20,7 +20,7 @@ fn setup(mut commands: Commands) {
 
     commands
         .spawn(SpriteBundle {
-            transform: Transform::from_scale(Vec3::new(100., 100., 1.)),
+            transform: Transform::from_scale(Vec3::new(100.0, 100.0, 1.0)),
             ..default()
         })
         .insert(InputManagerBundle::<BoxMovement>::default());
@@ -28,16 +28,17 @@ fn setup(mut commands: Commands) {
 
 fn pan_camera(
     mut query: Query<(&mut Transform, &ActionState<BoxMovement>)>,
-    camera: Query<(&Camera, &GlobalTransform)>,
+    camera: Query<(&Camera, &GlobalTransform)>
 ) {
     let (mut box_transform, action_state) = query.single_mut();
     let (camera, camera_transform) = camera.single();
 
     // Note: Nothing is stopping us from doing this in the action update system instead!
-    if let Some(box_pan_vector) = action_state
-        .axis_pair(&BoxMovement::MousePosition)
-        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor.xy()))
-        .map(|ray| ray.origin.truncate())
+    if
+        let Some(box_pan_vector) = action_state
+            .axis_pair(&BoxMovement::MousePosition)
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor.xy()))
+            .map(|ray| ray.origin.truncate())
     {
         box_transform.translation.x = box_pan_vector.x;
         box_transform.translation.y = box_pan_vector.y;

@@ -9,9 +9,9 @@
 use bevy::ecs::event::ManualEventReader;
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
-use leafwing_input_manager::action_diff::ActionDiffEvent;
-use leafwing_input_manager::prelude::*;
-use leafwing_input_manager::systems::generate_action_diffs;
+use input_manager::action_diff::ActionDiffEvent;
+use input_manager::prelude::*;
+use input_manager::systems::generate_action_diffs;
 
 use std::fmt::Debug;
 
@@ -29,15 +29,12 @@ enum FpsAction {
 /// In this case, we will just use the fact that there is only a single entity.
 fn process_action_diffs<A: Actionlike>(
     mut action_state_query: Query<&mut ActionState<A>>,
-    mut action_diff_events: EventReader<ActionDiffEvent<A>>,
+    mut action_diff_events: EventReader<ActionDiffEvent<A>>
 ) {
     for action_diff_event in action_diff_events.read() {
         if action_diff_event.owner.is_some() {
             let mut action_state = action_state_query.get_single_mut().unwrap();
-            action_diff_event
-                .action_diffs
-                .iter()
-                .for_each(|diff| action_state.apply_diff(diff));
+            action_diff_event.action_diffs.iter().for_each(|diff| action_state.apply_diff(diff));
         }
     }
 }
@@ -81,8 +78,11 @@ fn main() {
     assert!(player_state.pressed(&FpsAction::Shoot));
 
     // These events are transferred to the server
-    let event_reader =
-        send_events::<ActionDiffEvent<FpsAction>>(&client_app, &mut server_app, None);
+    let event_reader = send_events::<ActionDiffEvent<FpsAction>>(
+        &client_app,
+        &mut server_app,
+        None
+    );
 
     // The server processes the event stream
     server_app.update();
@@ -103,8 +103,11 @@ fn main() {
 
     // Sending over the new `ActionDiff` event stream,
     // we can see that the actions are now released on the server too
-    let _event_reader =
-        send_events::<ActionDiffEvent<FpsAction>>(&client_app, &mut server_app, Some(event_reader));
+    let _event_reader = send_events::<ActionDiffEvent<FpsAction>>(
+        &client_app,
+        &mut server_app,
+        Some(event_reader)
+    );
 
     server_app.update();
 
@@ -121,11 +124,12 @@ fn spawn_player(mut commands: Commands) {
     use FpsAction::*;
     use KeyCode::*;
 
-    let input_map = InputMap::new([(MoveLeft, KeyW), (MoveRight, KeyD), (Jump, Space)])
-        .with(Shoot, MouseButton::Left);
-    commands
-        .spawn(InputManagerBundle::with_map(input_map))
-        .insert(Player);
+    let input_map = InputMap::new([
+        (MoveLeft, KeyW),
+        (MoveRight, KeyD),
+        (Jump, Space),
+    ]).with(Shoot, MouseButton::Left);
+    commands.spawn(InputManagerBundle::with_map(input_map)).insert(Player);
 }
 
 /// A simple mock network interface that copies a set of events from the client to the server
@@ -138,7 +142,7 @@ fn spawn_player(mut commands: Commands) {
 fn send_events<A: Send + Sync + 'static + Debug + Clone + Event>(
     client_app: &App,
     server_app: &mut App,
-    reader: Option<ManualEventReader<A>>,
+    reader: Option<ManualEventReader<A>>
 ) -> ManualEventReader<A> {
     let client_events: &Events<A> = client_app.world().resource();
     let mut server_events: Mut<Events<A>> = server_app.world_mut().resource_mut();
